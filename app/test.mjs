@@ -1,44 +1,44 @@
-import OpenAI from "openai";
-const openai = new OpenAI();
+import OpenAI from 'openai'
+const openai = new OpenAI()
 
 async function generateProblem(topic) {
   const prompt = `Generate an algorithm problem related to ${topic}. The problem should be solvable in any programming language. Include:
   - A problem statement
   - Input and output requirements
-  - Example input-output pairs`;
+  - Example input-output pairs`
 
   try {
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: 'gpt-4o-mini',
       messages: [
         {
-          role: "system",
+          role: 'system',
           content:
-            "You are a software engineer who is writing an algorithm problem.",
+            'You are a software engineer who is writing an algorithm problem.',
         },
         {
-          role: "system",
-          content: "Problem:",
+          role: 'system',
+          content: 'Problem:',
         },
         {
-          role: "user",
+          role: 'user',
           content: prompt,
         },
       ],
       max_tokens: 300,
-    });
+    })
 
     if (response.choices && response.choices.length > 0) {
-      return response.choices[0].message;
+      return response.choices[0].message
     } else {
-      throw new Error("No choices returned in the response");
+      throw new Error('No choices returned in the response')
     }
   } catch (error) {
-    console.error("Error generating problem:", error);
-    throw error;
+    console.error('Error generating problem:', error)
+    throw error
   }
 }
 
-generateProblem("sorting")
-  .then((problem) => console.log("Generated Problem:\n", problem))
-  .catch((error) => console.error("Error generating problem:", error));
+generateProblem('sorting')
+  .then(problem => console.log('Generated Problem:\n', problem))
+  .catch(error => console.error('Error generating problem:', error))

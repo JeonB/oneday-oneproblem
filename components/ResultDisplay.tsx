@@ -1,4 +1,4 @@
-import CodeExecution from "./CodeExecution";
+import CodeExecution from './CodeExecution'
 
 export default function ResultDisplay() {
   return (
@@ -6,5 +6,5 @@ export default function ResultDisplay() {
       <h3>Execution Result</h3>
       <CodeExecution />
     </div>
-  );
+  )
 }

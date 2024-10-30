@@ -19,5 +19,5 @@ export default function ProblemDescription() {
         정수일 수 있으므로, 문자열로 반환합니다.
       </p>
     </div>
-  );
+  )
 }
