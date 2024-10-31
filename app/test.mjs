@@ -1,7 +1,7 @@
 import OpenAI from 'openai'
 const openai = new OpenAI()
 
-async function generateProblem(topic) {
+export async function generateProblem(topic) {
   const prompt = `Generate an algorithm problem related to ${topic}. The problem should be solvable in any programming language. Include:
   - A problem statement
   - Input and output requirements
@@ -39,6 +39,7 @@ async function generateProblem(topic) {
   }
 }
 
-generateProblem('sorting')
-  .then(problem => console.log('Generated Problem:\n', problem))
-  .catch(error => console.error('Error generating problem:', error))
+export default generateProblem
+// generateProblem('sorting')
+//   .then(problem => console.log('Generated Problem:\n', problem))
+//   .catch(error => console.error('Error generating problem:', error))
