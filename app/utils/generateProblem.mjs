@@ -25,11 +25,11 @@ export async function generateProblem(topic) {
           content: prompt,
         },
       ],
-      max_tokens: 300,
+      max_tokens: 500,
     })
 
     if (response.choices && response.choices.length > 0) {
-      return response.choices[0].message
+      return response.data.choices[0].text || 'No problem generated.'
     } else {
       throw new Error('No choices returned in the response')
     }
