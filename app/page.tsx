@@ -1,21 +1,41 @@
 'use client'
-import ProblemDescription from '@/components/ProblemDescription'
-import CodeEditor from '@/components/CodeEditor'
-import ResultDisplay from '@/components/ResultDisplay'
-import { CodeProvider } from '@/components/context/CodeContext'
+import { useRouter } from 'next/navigation'
+import React from 'react'
 
-export default function Home() {
+const algorithms = [
+  { name: 'Sorting', topic: 'sorting' },
+  { name: 'Searching', topic: 'searching' },
+  { name: 'Data Structures', topic: 'data structures' },
+  // 필요한 알고리즘 항목 추가
+]
+
+const MainPage: React.FC = () => {
+  const router = useRouter()
+
+  const handleAlgorithmClick = (topic: string) => {
+    // 사용자가 선택한 알고리즘으로 문제 페이지로 이동
+    router.push(`/problem/${topic}`)
+  }
+
   return (
-    <CodeProvider>
-      <div className="grid h-screen grid-cols-2">
-        <div>
-          <ProblemDescription />
-        </div>
-        <div className="flex flex-col p-4">
-          <CodeEditor />
-          <ResultDisplay />
-        </div>
+    <div style={{ padding: '2rem' }}>
+      <h1>Main Page</h1>
+      <div style={{ display: 'flex', gap: '1rem' }}>
+        {algorithms.map(algorithm => (
+          <button
+            key={algorithm.topic}
+            onClick={() => handleAlgorithmClick(algorithm.topic)}
+            style={{
+              padding: '1rem',
+              border: '1px solid #ddd',
+              borderRadius: '8px',
+            }}>
+            {algorithm.name}
+          </button>
+        ))}
       </div>
-    </CodeProvider>
+    </div>
   )
 }
+
+export default MainPage

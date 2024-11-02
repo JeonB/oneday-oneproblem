@@ -29,7 +29,7 @@ export async function generateProblem(topic) {
     })
 
     if (response.choices && response.choices.length > 0) {
-      return response.data.choices[0].text || 'No problem generated.'
+      return response.choices[0].message || 'No problem generated.'
     } else {
       throw new Error('No choices returned in the response')
     }
