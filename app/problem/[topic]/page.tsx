@@ -21,7 +21,7 @@ const ProblemPage: React.FC = () => {
       fetchProblem()
     }
   }, [topic])
-  console.log(problem)
+
   return (
     <CodeProvider>
       <div className="grid h-screen grid-cols-2">

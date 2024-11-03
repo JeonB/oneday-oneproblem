@@ -1,5 +1,8 @@
 import OpenAI from 'openai'
-const openai = new OpenAI()
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+  dangerouslyAllowBrowser: true,
+})
 
 export async function generateProblem(topic) {
   const prompt = `Generate an algorithm problem related to ${topic}. The problem should be solvable in any programming language. Include:
