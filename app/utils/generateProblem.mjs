@@ -4,11 +4,12 @@ const openai = new OpenAI({
   dangerouslyAllowBrowser: true,
 })
 
+// TODO: 생성 문제에대한 정답 검증을 추가해야 합니다.
 export async function generateProblem(topic) {
-  const prompt = `Generate an algorithm problem related to ${topic}. The problem should be solvable in any programming language. Include:
-  - A problem statement
-  - Input and output requirements
-  - Example input-output pairs`
+  const prompt = `다음 주제와 관련된 알고리즘 문제를 한글로 작성해 : ${topic}. 문제는 다음과 같은 내용을 포함해야 해:
+  - 문제 설명
+  - 입력과 출력 조건
+  - 입력과 출력 예시`
 
   try {
     const response = await openai.chat.completions.create({
@@ -16,12 +17,12 @@ export async function generateProblem(topic) {
       messages: [
         {
           role: 'system',
-          content:
-            'You are a software engineer who is writing an algorithm problem.',
-        },
-        {
-          role: 'system',
-          content: 'Problem:',
+          content: [
+            {
+              type: 'text',
+              text: '너는 알고리즘 문제를 작성하는 소프트웨어 엔지니어야. 응답은 반드시 html 형식으로 해. 그리고 최소한의 줄바꿈만 사용하고 문제를 읽는 사용자가 읽기 쉽게 응답 해줘.',
+            },
+          ],
         },
         {
           role: 'user',
@@ -32,7 +33,8 @@ export async function generateProblem(topic) {
     })
 
     if (response.choices && response.choices.length > 0) {
-      return response.choices[0].message || 'No problem generated.'
+      const rawText = response.choices[0].message.content
+      return rawText
     } else {
       throw new Error('No choices returned in the response')
     }
@@ -43,6 +45,3 @@ export async function generateProblem(topic) {
 }
 
 export default generateProblem
-// generateProblem('sorting')
-//   .then(problem => console.log('Generated Problem:\n', problem))
-//   .catch(error => console.error('Error generating problem:', error))
