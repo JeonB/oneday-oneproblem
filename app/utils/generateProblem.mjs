@@ -8,8 +8,10 @@ const openai = new OpenAI({
 export async function generateProblem(topic) {
   const prompt = `다음 주제와 관련된 알고리즘 문제를 한글로 작성해 : ${topic}. 문제는 다음과 같은 내용을 포함해야 해:
   - 문제 설명
-  - 입력과 출력 조건
-  - 입력과 출력 예시`
+  - 입력과 출력 조건(항상 '입력 조건', '출력 조건' 문구가 포함되어야 함)
+  - 입력과 출력 예시(항상 '입력 예시', '출력 예시' 문구가 포함되어야 함)
+  - 추가 설명이나 힌트는 작성하지 말 것
+  `
 
   try {
     const response = await openai.chat.completions.create({

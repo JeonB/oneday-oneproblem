@@ -5,6 +5,7 @@ import { generateProblem } from '../../utils/generateProblem.mjs'
 import CodeEditor from '@/components/CodeEditor'
 import ResultDisplay from '@/components/ResultDisplay'
 import { CodeProvider } from '@/components/context/CodeContext'
+import { useCode } from '@/components/context/CodeContext'
 
 const cleanHTMLResponse = (response: string) => {
   // ```html와 같은 코드 태그 제거
