@@ -4,11 +4,10 @@ interface TestCase {
   input: string[]
   expected: string
 }
-// AI가 생성한 문제와 함께 제공된 테스트 케이스 예시를 가져옵니다
+
 const parseTestCases = (aiGeneratedContent: string) => {
   const testCases: TestCase[] = []
-  // AI가 제공한 입력 예시와 출력 예시를 파싱하는 로직을 구현합니다
-  // 예: AI 응답 내용 중 "입력 예시"와 "출력 예시" 패턴을 기준으로 텍스트 파싱
+
   const inputExamples = aiGeneratedContent.match(
     /입력 예시.*\n([\s\S]*?)출력 예시.*\n([\s\S]*?)/g,
   )
