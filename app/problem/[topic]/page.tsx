@@ -20,6 +20,14 @@ const cleanHTMLResponse = (response: string) => {
     '<br>$1<br><br>',
   )
 
+  // 표의 셀에 Tailwind CSS 클래스 추가
+  response = response.replace(
+    /<table>/g,
+    '<table class="table-auto w-full border-collapse">',
+  )
+  response = response.replace(/<th>/g, '<th class="px-4 py-2 border">')
+  response = response.replace(/<td>/g, '<td class="px-4 py-2 border">')
+
   return response
 }
 
@@ -39,26 +47,16 @@ const ProblemPage: React.FC = () => {
         const parser = new DOMParser()
         const doc = parser.parseFromString(cleanedProblem, 'text/html')
 
-        // 입력 예시 추출
+        // 입출력 예시 추출
         const inputExampleHeader = Array.from(doc.querySelectorAll('h2')).find(
-          element => element.textContent?.includes('입력 예시'),
+          element => element.textContent?.includes('입출력 예시'),
         )
         const inputExampleElement = inputExampleHeader?.nextElementSibling
         const inputExample = inputExampleElement
           ? inputExampleElement.textContent?.trim() || ''
           : ''
 
-        // 출력 예시 추출
-        const outputExampleHeader = Array.from(doc.querySelectorAll('h2')).find(
-          element => element.textContent?.includes('출력 예시'),
-        )
-        const outputExampleElement = outputExampleHeader?.nextElementSibling
-        const outputExample = outputExampleElement
-          ? outputExampleElement.textContent?.trim() || ''
-          : ''
-
-        console.log('입력 예시:', inputExample)
-        console.log('출력 예시:', outputExample)
+        console.log('입출력 예시:', inputExample)
       }
 
       fetchProblem()
