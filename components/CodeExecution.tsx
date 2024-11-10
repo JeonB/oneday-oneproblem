@@ -9,7 +9,7 @@ interface TestResult {
   error?: string
 }
 export default function CodeExecution() {
-  const { code } = useCode()
+  const { code, aiGeneratedContent } = useCode()
   const [results, setResults] = useState<TestResult[]>([])
 
   const runCode = async () => {
@@ -17,7 +17,7 @@ export default function CodeExecution() {
     const response = await fetch('/api/executeCode', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code }),
+      body: JSON.stringify({ code, aiGeneratedContent }),
     })
     const data = await response.json()
     if (data.error) {
