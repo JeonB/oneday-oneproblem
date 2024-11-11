@@ -4,7 +4,6 @@ const openai = new OpenAI({
   dangerouslyAllowBrowser: true,
 })
 
-// TODO: 생성 문제에대한 정답 검증을 추가해야 합니다.
 export async function generateProblem(topic) {
   const prompt = `다음 주제와 관련된 알고리즘 문제를 한글로 작성해 : ${topic}. 문제는 solution 함수와 인자가 주어지면 그 함수를 수정하여 문제를 풀 수 있어여야 해. 또한, 다음과 같은 내용을 순서대로 포함해야 해:
   - 문제 설명(문제는 java,javascript,c,c++,python 중 하나로 구현할 수 있는 형태여야하며 특정 언어의 문법이나 내장 라이브러리에 대한 조건이 없어야 함. 또한, 함수가 어떤 형태여야 한다고 하지 말고 어떤 값을 반환해야 하는지만 알려줘야 함.)
