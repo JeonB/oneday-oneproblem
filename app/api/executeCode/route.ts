@@ -1,39 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { AiGeneratedContent } from '@/components/context/CodeContext'
 
-interface TestCase {
-  input: string[]
-  expected: string
-}
+const parseTestCases = (aiGeneratedContent: AiGeneratedContent[]) => {
+  const testCases: { input: any[]; output: any }[] = []
 
-const parseTestCases = (aiGeneratedContent: string) => {
-  const testCases: TestCase[] = []
+  const content = aiGeneratedContent.slice(1)
+  content.forEach(example => {
+    // Parse input as JSON array to handle multiple inputs dynamically
+    const input = Array.isArray(example.input)
+      ? example.input.map(item => JSON.parse(item))
+      : JSON.parse(example.input as string)
 
-  const inputExamples = aiGeneratedContent.match(
-    /입력 예시.*\n([\s\S]*?)출력 예시.*\n([\s\S]*?)/g,
-  )
+    // Parse output as JSON to handle either array or primitive types
+    const output = Array.isArray(example.output)
+      ? example.output.map(item => JSON.parse(item))
+      : JSON.parse(example.output as string)
 
-  if (inputExamples) {
-    inputExamples.forEach(example => {
-      const input = example.match(/입력:\s*([\s\S]*?)\n/)
-      const expectedOutput = example.match(/출력:\s*([\s\S]*?)\n/)
-      if (input && expectedOutput) {
-        testCases.push({
-          input: input[1].trim().split('\n'),
-          expected: expectedOutput[1].trim(),
-        })
-      }
-    })
-  }
+    testCases.push({ input, output })
+  })
+
   return testCases
 }
 
+// Helper function to compare arrays for test case results
+const arraysEqual = (a: any[], b: any[]) =>
+  a.length === b.length && a.every((val, index) => val === b[index])
+
 export async function POST(req: NextRequest) {
-  const { code, aiGeneratedProblem } = await req.json()
+  const { code, aiGeneratedContent } = await req.json()
+  const testCases = parseTestCases(aiGeneratedContent)
 
-  // 동적으로 생성된 문제에서 테스트 케이스를 파싱합니다
-  const testCases = parseTestCases(aiGeneratedProblem)
-
-  // 사용자가 입력한 코드를 solution 함수로 설정
   const wrappedCode = `
     ${code}
     return solution;
@@ -43,18 +39,22 @@ export async function POST(req: NextRequest) {
     const solution = new Function(wrappedCode)()
     const results = []
 
-    // 각 테스트 케이스 실행
-    for (const { input, expected } of testCases) {
+    for (const { input, output } of testCases) {
+      // Use the spread operator to pass multiple arguments to solution
       const result = solution(...input)
+
+      const passed = Array.isArray(output)
+        ? arraysEqual(result, output)
+        : result === output
+
       results.push({
         input,
-        expected,
+        output,
         result,
-        passed: result === expected,
+        passed,
       })
     }
 
-    // 모든 테스트 결과 반환
     return NextResponse.json({ results }, { status: 200 })
   } catch (error) {
     return NextResponse.json(

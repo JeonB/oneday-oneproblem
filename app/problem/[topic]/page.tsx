@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { generateProblem } from '../../utils/generateProblem.mjs'
 import CodeEditor from '@/components/CodeEditor'
 import ResultDisplay from '@/components/ResultDisplay'
-import { useCode } from '@/components/context/CodeContext'
+import { useCode, AiGeneratedContent } from '@/components/context/CodeContext'
 
 const cleanHTMLResponse = (response: string) => {
   // ```html와 같은 코드 태그 제거
@@ -27,6 +27,30 @@ const cleanHTMLResponse = (response: string) => {
   return response
 }
 
+const parseInputOutputExamples = (inputOutputExample: string) => {
+  const examples: AiGeneratedContent[] = []
+
+  // 블록 단위로 분리 (빈 줄 기준으로 구분)
+  const blocks = inputOutputExample.split(/\n\s*\n/).filter(Boolean)
+
+  blocks.forEach(block => {
+    // 각 블록을 줄 단위로 나누고, 공백 라인을 제거
+    const lines = block
+      .trim()
+      .split('\n')
+      .map(line => line.trim())
+      .filter(Boolean)
+
+    // 마지막 줄은 출력값으로, 나머지 줄은 입력값으로 설정
+    const output = lines.pop()
+    const input = lines
+
+    // input이 배열의 형태로 변환될 수 있게 함
+    examples.push({ input, output })
+  })
+
+  return examples
+}
 //TODO: 입출력 예시 값 추출
 const ProblemPage: React.FC = () => {
   const searchParams = useParams()
@@ -45,15 +69,21 @@ const ProblemPage: React.FC = () => {
         const doc = parser.parseFromString(cleanedProblem, 'text/html')
 
         // 입출력 예시 추출
-        const inputExampleHeader = Array.from(doc.querySelectorAll('h2')).find(
-          element => element.textContent?.includes('입출력 예시'),
-        )
-        const inputExampleElement = inputExampleHeader?.nextElementSibling
-        const inputExample = inputExampleElement
-          ? inputExampleElement.textContent?.trim() || ''
+        const inputOutputExampleHeader = Array.from(
+          doc.querySelectorAll('h2'),
+        ).find(element => element.textContent?.includes('입출력 예시'))
+        const inputOutputExampleElement =
+          inputOutputExampleHeader?.nextElementSibling
+        const inputOutputExample = inputOutputExampleElement
+          ? inputOutputExampleElement.textContent?.trim()
           : ''
-
-        console.log('입출력 예시:', inputExample)
+        const inputOutput = parseInputOutputExamples(inputOutputExample || '')
+        // AI가 생성한 내용을 상태로 설정
+        setAiGeneratedContent(inputOutput)
+        console.log(
+          '입출력 예시:',
+          parseInputOutputExamples(inputOutputExample || ''),
+        )
       }
 
       fetchProblem()
