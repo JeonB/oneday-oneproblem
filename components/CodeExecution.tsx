@@ -1,13 +1,14 @@
 import { useState } from 'react'
 import { useCode } from './context/CodeContext'
-interface TestResult {
-  X: string
-  Y: string
-  expected: string
-  result: string
+
+type TestResult = {
+  input: any[]
+  output: any
+  result: any
   passed: boolean
   error?: string
 }
+
 export default function CodeExecution() {
   const { code, aiGeneratedContent } = useCode()
   const [results, setResults] = useState<TestResult[]>([])
@@ -27,6 +28,9 @@ export default function CodeExecution() {
     }
   }
 
+  const formatResult = (value: any) =>
+    Array.isArray(value) ? JSON.stringify(value) : value
+
   return (
     <div>
       <button
@@ -41,9 +45,9 @@ export default function CodeExecution() {
               <p>Error: {result.error}</p>
             ) : (
               <p>
-                Test Case {index + 1}: X = {result.X}, Y = {result.Y}, Expected
-                = {result.expected}, Got = {result.result}, Passed ={' '}
-                {result.passed ? 'Yes' : 'No'}
+                Test Case {index + 1}: Expected = {formatResult(result.output)},
+                Got = {formatResult(result.result)},{' '}
+                {result.passed ? 'Passed' : 'Failed'}
               </p>
             )}
           </div>

@@ -1,10 +1,15 @@
 import React, { createContext, useContext, useState } from 'react'
 
+export type AiGeneratedContent = {
+  input: string[] | string
+  output: string | string[] | undefined
+}
+
 interface CodeContextType {
   code: string
-  setCode: React.Dispatch<React.SetStateAction<string>>
-  aiGeneratedContent: string
-  setAiGeneratedContent: React.Dispatch<React.SetStateAction<string>>
+  setCode: (code: string) => void
+  aiGeneratedContent: AiGeneratedContent[]
+  setAiGeneratedContent: (content: AiGeneratedContent[]) => void
 }
 interface CodeProviderProps {
   children: React.ReactNode
@@ -21,7 +26,9 @@ export const useCode = () => {
 
 export const CodeProvider: React.FC<CodeProviderProps> = ({ children }) => {
   const [code, setCode] = useState(`function solution(t,p)`)
-  const [aiGeneratedContent, setAiGeneratedContent] = useState('')
+  const [aiGeneratedContent, setAiGeneratedContent] = useState<
+    AiGeneratedContent[]
+  >([])
 
   return (
     <CodeContext.Provider

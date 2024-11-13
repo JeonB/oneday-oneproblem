@@ -4,7 +4,7 @@ import { javascript } from '@codemirror/lang-javascript'
 import { java } from '@codemirror/lang-java'
 import { cpp } from '@codemirror/lang-cpp'
 import { python } from '@codemirror/lang-python'
-import { useCode } from './context/CodeContext'
+import { useCode } from '@/components/context/CodeContext'
 
 export default function CodeEditor() {
   const codeContext = useCode()
