@@ -51,8 +51,8 @@ const parseInputOutputExamples = (inputOutputExample: string) => {
 
   return examples
 }
-//TODO: 입출력 예시 값 추출
-const ProblemPage: React.FC = () => {
+
+const ProblemPage = () => {
   const searchParams = useParams()
   const topic = searchParams['topic']
   const { setAiGeneratedContent } = useCode()
@@ -80,10 +80,6 @@ const ProblemPage: React.FC = () => {
         const inputOutput = parseInputOutputExamples(inputOutputExample || '')
         // AI가 생성한 내용을 상태로 설정
         setAiGeneratedContent(inputOutput)
-        console.log(
-          '입출력 예시:',
-          parseInputOutputExamples(inputOutputExample || ''),
-        )
       }
 
       fetchProblem()
