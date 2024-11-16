@@ -1,10 +1,11 @@
 'use client'
 import { useParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
 import { generateProblem } from '../../utils/generateProblem.mjs'
 import CodeEditor from '@/components/CodeEditor'
 import ResultDisplay from '@/components/ResultDisplay'
 import { useCode, AiGeneratedContent } from '@/components/context/CodeContext'
+import LoadingPage from './loading-out'
 
 const cleanHTMLResponse = (response: string) => {
   // ```html와 같은 코드 태그 제거
@@ -57,9 +58,12 @@ const ProblemPage = () => {
   const topic = searchParams['topic']
   const { setAiGeneratedContent } = useCode()
   const [problem, setProblem] = useState<string>('')
+  const [loading, setLoading] = useState<boolean>(true)
+
   useEffect(() => {
     if (topic) {
       const fetchProblem = async () => {
+        setLoading(true)
         const generatedProblem = await generateProblem(topic as string)
         const cleanedProblem = generatedProblem
           ? cleanHTMLResponse(generatedProblem)
@@ -80,21 +84,28 @@ const ProblemPage = () => {
         const inputOutput = parseInputOutputExamples(inputOutputExample || '')
         // AI가 생성한 내용을 상태로 설정
         setAiGeneratedContent(inputOutput)
+        setLoading(false)
       }
 
       fetchProblem()
     }
   }, [topic])
   return (
-    <div className="grid h-screen grid-cols-2">
-      <div
-        className="whitespace-normal p-4 text-left"
-        dangerouslySetInnerHTML={{ __html: problem }}></div>
-      <div className="flex flex-col p-4">
-        <CodeEditor />
-        <ResultDisplay />
-      </div>
-    </div>
+    <>
+      {loading ? (
+        <LoadingPage />
+      ) : (
+        <div className="grid h-screen grid-cols-2">
+          <div
+            className="whitespace-normal p-4 text-left"
+            dangerouslySetInnerHTML={{ __html: problem }}></div>
+          <div className="flex flex-col p-4">
+            <CodeEditor />
+            <ResultDisplay />
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 
