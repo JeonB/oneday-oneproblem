@@ -12,13 +12,13 @@ type TestResult = {
 export default function CodeExecution() {
   const { code, aiGeneratedContent } = useCode()
   const [results, setResults] = useState<TestResult[]>([])
-
+  const constraints = { min: -100000, max: 100000, length: 100 }
   const runCode = async () => {
     setResults([])
     const response = await fetch('/api/executeCode', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code, aiGeneratedContent }),
+      body: JSON.stringify({ code, aiGeneratedContent, constraints }),
     })
     const data = await response.json()
     if (data.error) {
