@@ -1,6 +1,6 @@
 'use client'
 import { useParams } from 'next/navigation'
-import { Suspense, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { generateProblem } from '../../utils/generateProblem.mjs'
 import CodeEditor from '@/components/CodeEditor'
 import ResultDisplay from '@/components/ResultDisplay'

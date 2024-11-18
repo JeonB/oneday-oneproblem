@@ -4,9 +4,15 @@ import React from 'react'
 
 const algorithms = [
   { name: 'Sorting', topic: 'sorting' },
+  { name: '선택 정렬', topic: 'Selection sort' },
+  { name: '삽입 정렬', topic: 'Insertion sort' },
+  { name: '버블 정렬', topic: 'Bubble sort' },
+  { name: '병합 정렬', topic: 'Merge sort' },
+  { name: '힙 정렬', topic: 'Heap sort' },
+  { name: '퀵 정렬', topic: 'Quick sort' },
+  { name: '트리 정렬', topic: 'Tree sort' },
   { name: 'Searching', topic: 'searching' },
   { name: 'Data Structures', topic: 'data structures' },
-  // 필요한 알고리즘 항목 추가
 ]
 
 const MainPage: React.FC = () => {
