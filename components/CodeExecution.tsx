@@ -57,7 +57,6 @@ export default function CodeExecution() {
       setFeedback({ error: data.error } as Feedback)
     } else {
       setFeedback(data.results)
-      console.log('데이터', data.results)
     }
     setFeedbackOn(true)
   }

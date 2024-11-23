@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(req: NextRequest) {
   const { generatedFeedback } = await req.json()
-  console.log(generatedFeedback)
   try {
     const { timeComplexity, feedback, aiImprovedCode } =
       JSON.parse(generatedFeedback)
