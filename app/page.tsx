@@ -3,41 +3,41 @@ import { useRouter } from 'next/navigation'
 import React from 'react'
 
 const algorithms = [
-  { name: 'Sorting', topic: 'sorting' },
-  { name: 'Searching', topic: 'searching' },
-  { name: 'Data Structures', topic: 'data structures' },
-  { name: 'Dynamic Programming', topic: 'dynamic programming' },
-  { name: 'Graph', topic: 'graph' },
-  { name: 'Greedy', topic: 'greedy' },
-  { name: 'Backtracking', topic: 'backtracking' },
-  { name: 'Bit Manipulation', topic: 'bit manipulation' },
-  { name: 'Math', topic: 'math' },
-  { name: 'String', topic: 'string' },
-  { name: 'Geometry', topic: 'geometry' },
-  { name: 'Tree', topic: 'tree' },
-  { name: 'Hashing', topic: 'hashing' },
-  { name: 'Stack', topic: 'stack' },
-  { name: 'Queue', topic: 'queue' },
-  { name: 'Heap', topic: 'heap' },
-  { name: 'Linked List', topic: 'linked list' },
-  { name: 'Trie', topic: 'trie' },
-  { name: 'Segment Tree', topic: 'segment tree' },
-  { name: 'Binary Search Tree', topic: 'binary search tree' },
-  { name: 'Disjoint Set', topic: 'disjoint set' },
-  { name: 'Fenwick Tree', topic: 'fenwick tree' },
-  { name: 'Suffix Array', topic: 'suffix array' },
-  { name: 'Topological Sort', topic: 'topological sort' },
-  { name: 'Shortest Path', topic: 'shortest path' },
-  { name: 'Minimum Spanning Tree', topic: 'minimum spanning tree' },
-  { name: 'Network Flow', topic: 'network flow' },
-  { name: 'String Matching', topic: 'string matching' },
-  { name: 'Convex Hull', topic: 'convex hull' },
-  { name: 'Computational Geometry', topic: 'computational geometry' },
-  { name: 'Game Theory', topic: 'game theory' },
-  { name: 'Combinatorics', topic: 'combinatorics' },
-  { name: 'Probability', topic: 'probability' },
-  { name: 'Number Theory', topic: 'number theory' },
-  { name: 'Combinatorial Game Theory', topic: 'combinatorial game theory' },
+  { name: '정렬', topic: 'sorting' },
+  { name: '탐색', topic: 'searching' },
+  { name: '자료 구조', topic: 'data structures' },
+  { name: '동적 계획법', topic: 'dynamic programming' },
+  { name: '그래프', topic: 'graph' },
+  { name: '탐욕법', topic: 'greedy' },
+  { name: '백트래킹', topic: 'backtracking' },
+  { name: '비트 조작', topic: 'bit manipulation' },
+  { name: '수학', topic: 'math' },
+  { name: '문자열', topic: 'string' },
+  { name: '기하학', topic: 'geometry' },
+  { name: '트리', topic: 'tree' },
+  { name: '해싱', topic: 'hashing' },
+  { name: '스택', topic: 'stack' },
+  { name: '큐', topic: 'queue' },
+  { name: '힙', topic: 'heap' },
+  { name: '연결 리스트', topic: 'linked list' },
+  { name: '트라이', topic: 'trie' },
+  { name: '세그먼트 트리', topic: 'segment tree' },
+  { name: '이진 탐색 트리', topic: 'binary search tree' },
+  { name: '분리 집합', topic: 'disjoint set' },
+  { name: '펜윅 트리', topic: 'fenwick tree' },
+  { name: '접미사 배열', topic: 'suffix array' },
+  { name: '위상 정렬', topic: 'topological sort' },
+  { name: '최단 경로', topic: 'shortest path' },
+  { name: '최소 신장 트리', topic: 'minimum spanning tree' },
+  { name: '네트워크 플로우', topic: 'network flow' },
+  { name: '문자열 매칭', topic: 'string matching' },
+  { name: '볼록 껍질', topic: 'convex hull' },
+  { name: '계산 기하학', topic: 'computational geometry' },
+  { name: '게임 이론', topic: 'game theory' },
+  { name: '조합론', topic: 'combinatorics' },
+  { name: '확률', topic: 'probability' },
+  { name: '정수론', topic: 'number theory' },
+  { name: '조합 게임 이론', topic: 'combinatorial game theory' },
 ]
 
 const MainPage: React.FC = () => {
@@ -51,16 +51,12 @@ const MainPage: React.FC = () => {
   return (
     <div style={{ padding: '2rem' }}>
       <h1>Main Page</h1>
-      <div style={{ display: 'flex', gap: '1rem' }}>
+      <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
         {algorithms.map(algorithm => (
           <button
             key={algorithm.topic}
             onClick={() => handleAlgorithmClick(algorithm.topic)}
-            style={{
-              padding: '1rem',
-              border: '1px solid #ddd',
-              borderRadius: '8px',
-            }}>
+            className="rounded-lg border border-gray-300 p-4">
             {algorithm.name}
           </button>
         ))}
