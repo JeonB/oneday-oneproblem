@@ -1,6 +1,7 @@
 'use client'
 import { useRouter } from 'next/navigation'
 import React from 'react'
+import Image from 'next/image'
 
 const algorithms = [
   { name: '정렬', topic: 'sorting' },
@@ -49,9 +50,17 @@ const MainPage: React.FC = () => {
   }
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h1>Main Page</h1>
-      <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+    <div style={{ margin: '0 auto', padding: '2rem', alignItems: 'center' }}>
+      <div className="px-18 my-10 flex flex-row justify-center">
+        <Image src="/images/logo.png" alt="logo" width={200} height={200} />
+        <div className="flex flex-col items-center">
+          <h1 className="p-4 text-center text-6xl">
+            알고리즘 실력 향상을 위한 <br /> 맞춤형 학습 플랫폼
+          </h1>
+          <button>오늘의 문제 풀이</button>
+        </div>
+      </div>
+      <div className="flex flex-wrap justify-center gap-4">
         {algorithms.map(algorithm => (
           <button
             key={algorithm.topic}

@@ -1,0 +1,43 @@
+.ul {
+  list-style: none;
+  display: flex;
+  margin-top: 1rem;
+  padding: 0;
+  justify-content: 'center';
+}
+
+.li {
+  margin-left: 2rem;
+}
+
+.a {
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+  font-size: 1em;
+  display: block;
+  margin-bottom: 1em;
+}
+
+.a2 {
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+  font-size: 1em;
+  display: block;
+}
+.a:hover {
+  color: #0070f3; /* 링크에 마우스를 올렸을 때 색상 변경 */
+}
+
+.logo {
+  width: 10em;
+  padding: 15px 0px 15px 20px;
+}
+
+@media (max-width: 400px) {
+  .logo {
+    width: 8em;
+    min-width: 120px;
+  }
+}

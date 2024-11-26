@@ -15,10 +15,23 @@
 
 html,
 body {
+  height: 100%;
   max-width: 100vw;
-  /* overflow-x: hidden; */
+}
+.container {
+  display: flex;
+  flex-direction: column;
+  min-width: 100vw;
+  min-height: 100vh;
 }
 
+.main-content {
+  flex: 1; /* 남은 공간을 차지하도록 설정 */
+}
+
+.footer {
+  flex-shrink: 0; /* Footer가 줄어들지 않도록 설정 */
+}
 body {
   color: var(--foreground);
   background: var(--background);
