@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation'
 import React from 'react'
 import Image from 'next/image'
 
+// TODO: 알고리즘 목록을 서버에서 받아오기
 const algorithms = [
   { name: '정렬', topic: 'sorting' },
   { name: '탐색', topic: 'searching' },
@@ -41,6 +42,7 @@ const algorithms = [
   { name: '조합 게임 이론', topic: 'combinatorial game theory' },
 ]
 
+// TODO: 메인 페이지 디자인 수정
 const MainPage: React.FC = () => {
   const router = useRouter()
 
