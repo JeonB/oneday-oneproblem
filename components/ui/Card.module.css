@@ -1,5 +1,16 @@
 .card {
-  background-color: white;
-  border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  background-color: rgb(182, 106, 106);
+  border-radius: 16px;
+  box-shadow: 0 10px 16px rgba(0, 0, 0, 0.7);
+  width: 10rem;
+  height: 10rem;
+}
+
+.card:hover {
+  background-color: rgb(102, 46, 46);
+}
+
+.card h2,
+h3 {
+  text-align: center;
 }
