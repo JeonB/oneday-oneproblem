@@ -24,8 +24,11 @@ export const useCode = () => {
   return context
 }
 
+const solution = `function solution(){
+  return 0;
+}`
 export const CodeProvider: React.FC<CodeProviderProps> = ({ children }) => {
-  const [code, setCode] = useState(`function solution(){ return 0; }`)
+  const [code, setCode] = useState(solution)
   const [aiGeneratedContent, setAiGeneratedContent] = useState<
     AiGeneratedContent[]
   >([])
