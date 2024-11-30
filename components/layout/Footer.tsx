@@ -13,17 +13,13 @@ export const Footer = () => {
           <div>
             <div>
               <p style={{ fontSize: '13px' }}>
-                <span className="footSpan">
-                  주소 : 서울 강서구 마곡서로 152 두산더랜드타워 B동
-                  801호(마곡동)
-                </span>
+                <span className="footSpan">주소 : 서울 관악구 행운4길</span>
               </p>
             </div>
 
             <div>
               <p style={{ marginTop: '15px', fontSize: '13px' }}>
-                <span className="footSpan">대표번호 : 02-6383-3101</span> | 팩스
-                : 02-6383-3104
+                <span className="footSpan">대표번호 : 010-4233-5481</span>
               </p>
             </div>
           </div>
@@ -40,8 +36,8 @@ export const Footer = () => {
             <div style={{ marginTop: '15px' }}>
               <p style={{ fontSize: '13px' }}>
                 <span className="footSpan">
-                  &copy; 2001 - {new Date().getFullYear()} IF Information
-                  Systems All Rights Reserved.
+                  &copy; 2001 - {new Date().getFullYear()} JeonB All Rights
+                  Reserved.
                 </span>
               </p>
             </div>
