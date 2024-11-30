@@ -2,8 +2,9 @@
 import { useRouter } from 'next/navigation'
 import React from 'react'
 import Image from 'next/image'
+import mongoose from 'mongoose'
+import { connectDB } from '@/app/utils/connecter'
 
-// TODO: 알고리즘 목록을 서버에서 받아오기
 const algorithms = [
   { name: '정렬', topic: 'sorting' },
   { name: '탐색', topic: 'searching' },
@@ -40,8 +41,23 @@ const algorithms = [
   { name: '확률', topic: 'probability' },
   { name: '정수론', topic: 'number theory' },
   { name: '조합 게임 이론', topic: 'combinatorial game theory' },
+  { name: '동적 계획법 최적화', topic: 'dynamic programming optimization' },
 ]
 
+const insertAlgorithms = async () => {
+  const response = await fetch('/api/insertAlgo', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ algorithms }),
+  })
+  if (response.ok) {
+    console.log('Algorithms inserted successfully')
+  } else {
+    console.error('Failed to insert algorithms:', response.statusText)
+  }
+}
 // TODO: 메인 페이지 디자인 수정
 const MainPage: React.FC = () => {
   const router = useRouter()
@@ -53,6 +69,7 @@ const MainPage: React.FC = () => {
 
   return (
     <div style={{ margin: '0 auto', padding: '2rem', alignItems: 'center' }}>
+      <button onClick={insertAlgorithms}>알고리즘 추가</button>
       <div className="px-18 my-10 flex flex-row justify-center">
         <Image src="/images/logo.png" alt="logo" width={200} height={200} />
         <div className="flex flex-col items-center">
