@@ -1,25 +1,28 @@
 import React, { ReactNode } from 'react'
 import Image from 'next/image'
-import classes from './Card.module.css'
 
 type CardProps = {
   algorithm: string
   topic: string
   img: string
+  onClick?: () => void
 }
-function Card({ topic, algorithm, img }: CardProps) {
+function Card({ topic, algorithm, img, onClick }: CardProps) {
   return (
-    <div className={classes.card}>
-      <h2>{topic}</h2>
+    <div
+      className="h-40 w-40 cursor-pointer items-center rounded-lg bg-[#dbd0c4] shadow-lg hover:bg-[#b8a89a]"
+      onClick={onClick}>
+      <h1 className="text-center text-lg text-slate-900 md:text-xl">
+        {algorithm}
+      </h1>
       <Image
-        src={`images/${img}`}
+        src={img}
         alt="logo"
-        className={classes.logo}
+        className="mx-auto"
         priority
         width={100}
         height={100}
       />
-      <h3>{algorithm}</h3>
     </div>
   )
 }

@@ -4,8 +4,8 @@ export const Footer = () => {
   return (
     <div
       style={{
-        backgroundColor: '#f8f9fa',
-        color: '#212529',
+        backgroundColor: '#353535',
+        color: 'white',
         padding: '10px 0',
       }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '10px' }}>

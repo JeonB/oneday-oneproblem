@@ -2,46 +2,54 @@
 import { useRouter } from 'next/navigation'
 import React from 'react'
 import Image from 'next/image'
-import mongoose from 'mongoose'
-import { connectDB } from '@/app/utils/connecter'
+import Card from '@/components/ui/Card'
 
 const algorithms = [
-  { name: '정렬', topic: 'sorting' },
-  { name: '탐색', topic: 'searching' },
-  { name: '자료 구조', topic: 'data structures' },
-  { name: '동적 계획법', topic: 'dynamic programming' },
-  { name: '그래프', topic: 'graph' },
-  { name: '탐욕법', topic: 'greedy' },
-  { name: '백트래킹', topic: 'backtracking' },
-  { name: '비트 조작', topic: 'bit manipulation' },
-  { name: '수학', topic: 'math' },
-  { name: '문자열', topic: 'string' },
-  { name: '기하학', topic: 'geometry' },
-  { name: '트리', topic: 'tree' },
-  { name: '해싱', topic: 'hashing' },
-  { name: '스택', topic: 'stack' },
-  { name: '큐', topic: 'queue' },
-  { name: '힙', topic: 'heap' },
-  { name: '연결 리스트', topic: 'linked list' },
-  { name: '트라이', topic: 'trie' },
-  { name: '세그먼트 트리', topic: 'segment tree' },
-  { name: '이진 탐색 트리', topic: 'binary search tree' },
-  { name: '분리 집합', topic: 'disjoint set' },
-  { name: '펜윅 트리', topic: 'fenwick tree' },
-  { name: '접미사 배열', topic: 'suffix array' },
-  { name: '위상 정렬', topic: 'topological sort' },
-  { name: '최단 경로', topic: 'shortest path' },
-  { name: '최소 신장 트리', topic: 'minimum spanning tree' },
-  { name: '네트워크 플로우', topic: 'network flow' },
-  { name: '문자열 매칭', topic: 'string matching' },
-  { name: '볼록 껍질', topic: 'convex hull' },
-  { name: '계산 기하학', topic: 'computational geometry' },
-  { name: '게임 이론', topic: 'game theory' },
-  { name: '조합론', topic: 'combinatorics' },
-  { name: '확률', topic: 'probability' },
-  { name: '정수론', topic: 'number theory' },
-  { name: '조합 게임 이론', topic: 'combinatorial game theory' },
-  { name: '동적 계획법 최적화', topic: 'dynamic programming optimization' },
+  {
+    name: '동적 계획법',
+    topic: 'dynamic programming',
+    img: '/images/logo.png',
+  },
+  { name: '그래프', topic: 'graph', img: '/images/graph.png' },
+  { name: '탐욕법', topic: 'greedy', img: '/images/greedy.png' },
+  { name: '백트래킹', topic: 'backtracking', img: '/images/backtracking.png' },
+  {
+    name: '비트 조작',
+    topic: 'bit manipulation',
+    img: '/images/bit_manipulation.png',
+  },
+  { name: '문자열', topic: 'string', img: '/images/string.png' },
+  { name: '트리', topic: 'tree', img: '/images/tree.png' },
+  { name: '해싱', topic: 'hashing', img: '/images/hashing.png' },
+  { name: '스택', topic: 'stack', img: '/images/stack.png' },
+  { name: '큐', topic: 'queue', img: '/images/queue.png' },
+  { name: '힙', topic: 'heap', img: '/images/heap.png' },
+  { name: '연결 리스트', topic: 'linked list', img: '/images/linked_list.png' },
+  {
+    name: '이진 탐색',
+    topic: 'binary search',
+    img: '/images/binary_search.png',
+  },
+  {
+    name: '최단 경로',
+    topic: 'shortest path',
+    img: '/images/shortest_path.png',
+  },
+  {
+    name: '최소 신장 트리',
+    topic: 'minimum spanning tree',
+    img: '/images/minimum_spanning_tree.png',
+  },
+  {
+    name: '위상 정렬',
+    topic: 'topological sort',
+    img: '/images/topological_sort.png',
+  },
+  {
+    name: '문자열 매칭',
+    topic: 'string matching',
+    img: '/images/string_matching.png',
+  },
 ]
 
 const insertAlgorithms = async () => {
@@ -58,7 +66,6 @@ const insertAlgorithms = async () => {
     console.error('Failed to insert algorithms:', response.statusText)
   }
 }
-// TODO: 메인 페이지 디자인 수정
 const MainPage: React.FC = () => {
   const router = useRouter()
 
@@ -68,25 +75,39 @@ const MainPage: React.FC = () => {
   }
 
   return (
-    <div style={{ margin: '0 auto', padding: '2rem', alignItems: 'center' }}>
-      <button onClick={insertAlgorithms}>알고리즘 추가</button>
-      <div className="px-18 my-10 flex flex-row justify-center">
-        <Image src="/images/logo.png" alt="logo" width={200} height={200} />
-        <div className="flex flex-col items-center">
-          <h1 className="p-4 text-center text-6xl">
+    <div className="mx-auto flex flex-col items-center p-8">
+      <button
+        onClick={insertAlgorithms}
+        className="mb-4 rounded bg-blue-500 px-4 py-2 text-white">
+        알고리즘 추가
+      </button>
+      <div className="mb-10 flex flex-row justify-center gap-8">
+        <Image src="/images/logo.png" alt="logo" width={150} height={100} />
+        <div className="mt-4 flex flex-col items-center">
+          <h1 className="mb-4 text-center text-3xl font-bold md:text-4xl">
             알고리즘 실력 향상을 위한 <br /> 맞춤형 학습 플랫폼
           </h1>
-          <button>오늘의 문제 풀이</button>
+          <button className="rounded-full bg-[#43B9AA] px-6 py-2 text-white">
+            오늘의 문제 풀이
+          </button>
         </div>
       </div>
-      <div className="flex flex-wrap justify-center gap-4">
+      <div className="flex flex-wrap justify-center gap-4 px-20">
         {algorithms.map(algorithm => (
-          <button
+          <Card
             key={algorithm.topic}
             onClick={() => handleAlgorithmClick(algorithm.topic)}
-            className="rounded-lg border border-gray-300 p-4">
+            topic={algorithm.topic}
+            algorithm={algorithm.name}
+            img={algorithm.img}
+          />
+          /* <button
+            key={algorithm.topic}
+            onClick={() => handleAlgorithmClick(algorithm.topic)}
+            className="rounded-lg border border-gray-300 p-4 flex flex-col items-center">
+            <Image src={algorithm.img} alt={algorithm.name} width={50} height={50} />
             {algorithm.name}
-          </button>
+            </button> */
         ))}
       </div>
     </div>
