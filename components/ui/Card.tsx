@@ -10,7 +10,7 @@ type CardProps = {
 function Card({ topic, algorithm, img, onClick }: CardProps) {
   return (
     <div
-      className="flex h-40 w-40 cursor-pointer flex-col items-center justify-center rounded-lg bg-[#dbd0c4] shadow-lg hover:bg-[#b8a89a]"
+      className="flex h-32 w-32 cursor-pointer flex-col items-center justify-center rounded-lg bg-[#dbd0c4] shadow-lg hover:bg-[#b8a89a] md:h-40 md:w-40"
       onClick={onClick}>
       <h1 className="mb-2 text-center text-lg text-slate-900 md:text-xl">
         {algorithm}
@@ -18,10 +18,16 @@ function Card({ topic, algorithm, img, onClick }: CardProps) {
       <Image
         src={img}
         alt="logo"
-        className="mx-auto"
-        priority
+        className="hidden md:mx-auto md:block"
         width={100}
         height={100}
+      />
+      <Image
+        src={img}
+        alt="logo"
+        className="block md:hidden"
+        width={50}
+        height={50}
       />
     </div>
   )

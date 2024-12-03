@@ -35,6 +35,7 @@ export default function ClientLayout({ children }: Props) {
           width: '100%',
           zIndex: 1000,
           backgroundColor: '#353535',
+          borderBottom: '0.5px solid rgba(234, 234, 234, 0.5)',
         }}>
         {isMobile ? <MobileHeader /> : <NavBar />}
       </header>

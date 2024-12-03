@@ -7,6 +7,7 @@ export const Footer = () => {
         backgroundColor: '#353535',
         color: 'white',
         padding: '10px 0',
+        borderTop: '0.5px solid rgba(234, 234, 234, 0.5)',
       }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '10px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>

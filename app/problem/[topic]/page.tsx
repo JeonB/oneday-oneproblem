@@ -6,6 +6,7 @@ import CodeEditor from '@/components/CodeEditor'
 import ResultDisplay from '@/components/ResultDisplay'
 import { useCode, AiGeneratedContent } from '@/components/context/CodeContext'
 import LoadingPage from './loading-out'
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 
 const cleanHTMLResponse = (response: string) => {
   // ```html와 같은 코드 태그 제거
@@ -95,15 +96,20 @@ const ProblemPage = () => {
       {loading ? (
         <LoadingPage />
       ) : (
-        <div className="grid h-screen grid-cols-2">
-          <div
-            className="whitespace-normal p-4 text-left"
-            dangerouslySetInnerHTML={{ __html: problem }}></div>
-          <div className="flex flex-col p-4">
-            <CodeEditor />
-            <ResultDisplay />
-          </div>
-        </div>
+        <PanelGroup direction="horizontal">
+          <Panel defaultSizePercentage={50} minSizePercentage={30}>
+            <div
+              className="whitespace-normal p-4 text-left"
+              dangerouslySetInnerHTML={{ __html: problem }}></div>
+          </Panel>
+          <PanelResizeHandle className="h-screen w-1 bg-stone-400" />
+          <Panel defaultSizePercentage={50} minSizePercentage={30}>
+            <div className="flex flex-col p-4">
+              <CodeEditor />
+              <ResultDisplay />
+            </div>
+          </Panel>
+        </PanelGroup>
       )}
     </>
   )

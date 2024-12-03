@@ -71,13 +71,19 @@ const MainPage: React.FC = () => {
 
   return (
     <div className="mx-auto flex flex-col items-center p-8">
-      <button
+      {/* <button
         onClick={insertAlgorithms}
         className="mb-4 rounded bg-blue-500 px-4 py-2 text-white">
         알고리즘 추가
-      </button>
+      </button> */}
       <div className="mb-10 flex flex-row justify-center gap-8">
-        <Image src="/images/logo.png" alt="logo" width={150} height={100} />
+        <Image
+          src="/images/logo.png"
+          alt="logo"
+          width={150}
+          height={100}
+          className="hidden rounded-lg md:block"
+        />
         <div className="mt-4 flex flex-col items-center">
           <h1 className="mb-4 text-center text-3xl font-bold md:text-4xl">
             알고리즘 실력 향상을 위한 <br /> 맞춤형 학습 플랫폼
@@ -87,7 +93,7 @@ const MainPage: React.FC = () => {
           </button>
         </div>
       </div>
-      <div className="flex flex-wrap justify-center gap-4 px-20">
+      <div className="flex flex-wrap justify-center gap-4 md:px-20">
         {algorithms.map(algorithm => (
           <Card
             key={algorithm.topic}
@@ -96,13 +102,6 @@ const MainPage: React.FC = () => {
             algorithm={algorithm.name}
             img={algorithm.img}
           />
-          /* <button
-            key={algorithm.topic}
-            onClick={() => handleAlgorithmClick(algorithm.topic)}
-            className="rounded-lg border border-gray-300 p-4 flex flex-col items-center">
-            <Image src={algorithm.img} alt={algorithm.name} width={50} height={50} />
-            {algorithm.name}
-            </button> */
         ))}
       </div>
     </div>

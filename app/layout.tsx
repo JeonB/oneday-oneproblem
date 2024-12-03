@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
 import './globals.css'
+
 import ClientLayout from '@/components/layout/ClientLayout'
 import { Footer } from '@/components/layout/Footer'
 
