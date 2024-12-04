@@ -4,6 +4,7 @@ import LoginForm from '@/components/ui/LoginForm'
 const meta: Meta<typeof LoginForm> = {
   title: 'Example/LoginForm',
   component: LoginForm,
+  tags: ['autodocs'],
 }
 
 export default meta
