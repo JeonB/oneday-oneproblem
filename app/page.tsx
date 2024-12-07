@@ -2,7 +2,8 @@
 import { useRouter } from 'next/navigation'
 import React from 'react'
 import Image from 'next/image'
-import Card from '@/components/ui/Card'
+import Card from '@/components/ui/AlgorithmCard'
+import { Button } from '@/components/ui/button'
 
 const algorithms = [
   {
@@ -70,41 +71,45 @@ const MainPage: React.FC = () => {
   }
 
   return (
-    <div className="mx-auto flex flex-col items-center p-8">
-      {/* <button
+    <>
+      <div className="mx-auto flex flex-col items-center p-8">
+        {/* <button
         onClick={insertAlgorithms}
         className="mb-4 rounded bg-blue-500 px-4 py-2 text-white">
         알고리즘 추가
       </button> */}
-      <div className="mb-10 flex flex-row justify-center gap-8">
-        <Image
-          src="/images/logo.png"
-          alt="logo"
-          width={150}
-          height={100}
-          className="hidden rounded-lg md:block"
-        />
-        <div className="mt-4 flex flex-col items-center">
-          <h1 className="mb-4 text-center text-3xl font-bold md:text-4xl">
-            알고리즘 실력 향상을 위한 <br /> 맞춤형 학습 플랫폼
-          </h1>
-          <button className="rounded-full bg-[#43B9AA] px-6 py-2 text-white">
-            오늘의 문제 풀이
-          </button>
+        <div className="mb-10 flex flex-row justify-center gap-8">
+          <Image
+            src="/images/logo.png"
+            alt="logo"
+            width={150}
+            height={100}
+            className="hidden rounded-lg md:block"
+          />
+          <div className="mt-4 flex flex-col items-center">
+            <h1 className="mb-4 text-center text-3xl font-bold md:text-4xl">
+              알고리즘 실력 향상을 위한 <br /> 맞춤형 학습 플랫폼
+            </h1>
+            <button className="rounded-full bg-[#43B9AA] px-6 py-2 text-white">
+              오늘의 문제 풀이
+            </button>
+          </div>
         </div>
       </div>
-      <div className="flex flex-wrap justify-center gap-4 md:px-20">
-        {algorithms.map(algorithm => (
-          <Card
-            key={algorithm.topic}
-            onClick={() => handleAlgorithmClick(algorithm.topic)}
-            topic={algorithm.topic}
-            algorithm={algorithm.name}
-            img={algorithm.img}
-          />
-        ))}
+      <div className="flex justify-center">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          {algorithms.map(algorithm => (
+            <Card
+              key={algorithm.topic}
+              onClick={() => handleAlgorithmClick(algorithm.topic)}
+              topic={algorithm.topic}
+              algorithm={algorithm.name}
+              img={algorithm.img}
+            />
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 

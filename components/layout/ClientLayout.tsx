@@ -1,7 +1,7 @@
 'use client'
 
 import MobileHeader from '@/components/layout/mobile/MobileHeader'
-import NavBar from '@/components/layout/NavBar'
+import Header from '@/components/layout/Header'
 import { useEffect, useState } from 'react'
 
 type Props = {
@@ -37,7 +37,7 @@ export default function ClientLayout({ children }: Props) {
           backgroundColor: '#353535',
           borderBottom: '0.5px solid rgba(234, 234, 234, 0.5)',
         }}>
-        {isMobile ? <MobileHeader /> : <NavBar />}
+        {isMobile ? <MobileHeader /> : <Header />}
       </header>
       <main>{children}</main>
     </>
