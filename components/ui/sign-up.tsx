@@ -1,5 +1,6 @@
+'use client'
 import React, { useState } from 'react'
-import SignUpForm from './SignUpForm'
+import CardsCreateAccount from './sign-up-form'
 import { useRouter } from 'next/navigation'
 import { AlertDialogUI } from './AlertDialog'
 
@@ -7,7 +8,7 @@ const SignUp: React.FC = () => {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
+  //   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
   const router = useRouter()
 
@@ -23,10 +24,10 @@ const SignUp: React.FC = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (password !== confirmPassword) {
-      setError('Passwords do not match')
-      return
-    }
+    // if (password !== confirmPassword) {
+    //   setError('Passwords do not match')
+    //   return
+    // }
 
     try {
       const response = await fetch('/api/signup', {
@@ -55,16 +56,16 @@ const SignUp: React.FC = () => {
   }
 
   return (
-    <SignUpForm
+    <CardsCreateAccount
       name={name}
       email={email}
       password={password}
-      confirmPassword={confirmPassword}
+      //   confirmPassword={confirmPassword}
       error={error}
       onNameChange={setName}
       onEmailChange={setEmail}
       onPasswordChange={setPassword}
-      onConfirmPasswordChange={setConfirmPassword}
+      //   onConfirmPasswordChange={setConfirmPassword}
       onSubmit={handleSignUp}
     />
   )

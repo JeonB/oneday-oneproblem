@@ -1,13 +1,17 @@
+'use client'
+
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import LoginForm from './LoginForm'
+import LoginForm from './login-form'
+import { useStore } from '../context/StoreContext'
+import jwt from 'jsonwebtoken'
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const router = useRouter()
-
+  const { user, setUser } = useStore()
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
@@ -25,25 +29,24 @@ const Login: React.FC = () => {
 
       const data = await response.json()
       const { token } = data
-
+      localStorage.setItem('token', token)
+      document.cookie = `token=${token}; path=/;`
       // Verify JWT token
-      const userResponse = await fetch('/api/user', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      // const userResponse = await fetch('/api/user', {
+      //   headers: {
+      //     Authorization: `Bearer ${token}`,
+      //   },
+      // })
 
-      if (!userResponse.ok) {
-        throw new Error('Failed to fetch user data')
-      }
+      // if (!userResponse.ok) {
+      //   throw new Error('Failed to fetch user data')
+      // }
 
-      const userData = await userResponse.json()
-      console.log('User data:', userData)
-
-      // Redirect to dashboard
-      router.push('/dashboard')
+      // const userData = await userResponse.json()
+      // console.log('User data:', userData)
+      router.push('/')
     } catch (err) {
-      setError('Login failed. Please check your credentials.')
+      setError('로그인에 실패했습니다. 아이디와 비밀번호를 확인해주세요.')
     }
   }
 

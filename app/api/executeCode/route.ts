@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { AiGeneratedContent } from '@/components/context/CodeContext'
+import { AiGeneratedContent } from '@/components/context/StoreContext'
 
 // AI가 생성한 테스트 케이스 파싱
 export const parseTestCases = (aiGeneratedContent: AiGeneratedContent[]) => {

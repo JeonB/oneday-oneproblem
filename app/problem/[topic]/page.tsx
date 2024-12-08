@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { generateProblem } from '../../utils/generateProblem.mjs'
 import CodeEditor from '@/components/CodeEditor'
 import ResultDisplay from '@/components/ResultDisplay'
-import { useCode, AiGeneratedContent } from '@/components/context/CodeContext'
+import { useStore, AiGeneratedContent } from '@/components/context/StoreContext'
 import LoadingPage from './loading-out'
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 
@@ -57,7 +57,7 @@ const parseInputOutputExamples = (inputOutputExample: string) => {
 const ProblemPage = () => {
   const searchParams = useParams()
   const topic = searchParams['topic']
-  const { setAiGeneratedContent } = useCode()
+  const { setAiGeneratedContent } = useStore()
   const [problem, setProblem] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(true)
 

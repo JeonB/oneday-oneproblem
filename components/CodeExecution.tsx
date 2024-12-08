@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useCode } from './context/CodeContext'
+import { useStore } from './context/StoreContext'
 import generateFeedback from '@/app/utils/generateFeedback.mjs'
 
 type TestResult = {
@@ -18,7 +18,7 @@ type Feedback = {
 }
 
 export default function CodeExecution() {
-  const { code, aiGeneratedContent } = useCode()
+  const { code, aiGeneratedContent } = useStore()
   const [results, setResults] = useState<TestResult[]>([])
   const [feedback, setFeedback] = useState<Feedback>()
   const [isFeedbackOn, setFeedbackOn] = useState(false)
