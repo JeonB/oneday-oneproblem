@@ -19,7 +19,6 @@ export default async function Header() {
     : null
 
   const user = decoded ? { name: decoded.name } : null
-
   return (
     <ClientHeader user={user}>
       <Link href="/">

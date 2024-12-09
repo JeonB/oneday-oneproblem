@@ -1,3 +1,4 @@
+'use client'
 import React, { createContext, useContext, useState } from 'react'
 
 export type AiGeneratedContent = {
@@ -10,6 +11,8 @@ interface ContextType {
   setCode: (code: string) => void
   aiGeneratedContent: AiGeneratedContent[]
   setAiGeneratedContent: (content: AiGeneratedContent[]) => void
+  loginState: boolean
+  setLoginState: (state: boolean) => void
 }
 interface CodeProviderProps {
   children: React.ReactNode
@@ -32,6 +35,7 @@ export const OneDayProvider: React.FC<CodeProviderProps> = ({ children }) => {
   const [aiGeneratedContent, setAiGeneratedContent] = useState<
     AiGeneratedContent[]
   >([])
+  const [loginState, setLoginState] = useState(false)
 
   return (
     <OneDayContext.Provider
@@ -40,6 +44,8 @@ export const OneDayProvider: React.FC<CodeProviderProps> = ({ children }) => {
         setCode,
         aiGeneratedContent,
         setAiGeneratedContent,
+        loginState: loginState,
+        setLoginState,
       }}>
       {children}
     </OneDayContext.Provider>

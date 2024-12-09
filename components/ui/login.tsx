@@ -3,6 +3,7 @@
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import LoginForm from './login-form'
+import { signIn } from 'next-auth/react'
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('')
@@ -22,6 +23,16 @@ const Login: React.FC = () => {
       })
 
       if (!response.ok) {
+        throw new Error('Login failed')
+      }
+
+      const result = await signIn('credentials', {
+        redirect: false,
+        email,
+        password,
+      })
+
+      if (result?.error) {
         throw new Error('Login failed')
       }
 
