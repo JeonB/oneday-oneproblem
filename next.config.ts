@@ -13,9 +13,6 @@ const nextConfig: NextConfig = {
     MONGODB_URI: process.env.MONGODB_URI,
     JWT_SECRET: process.env.JWT_SECRET,
   },
-  images: {
-    domains: ['example.com', 'cdn.example.com'], // 외부 이미지 도메인
-  },
   webpack: (config, { isServer, dev }) => {
     if (dev) {
       config.cache = false

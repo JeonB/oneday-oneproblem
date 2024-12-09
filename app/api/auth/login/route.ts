@@ -1,4 +1,4 @@
-import User from '@/app/utils/models/User'
+import User, { UserProps } from '@/app/utils/models/User'
 import { connectDB } from '@/app/utils/connecter'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
   await connectDB()
 
   const { email, password } = await req.json()
-  const user = await User.findOne({ email })
+  const user = (await User.findOne({ email })) as UserProps | null
 
   if (!user) {
     return NextResponse.json(
@@ -30,16 +30,32 @@ export async function POST(req: NextRequest) {
     throw new Error('JWT_SECRET is not defined')
   }
 
-  const token = jwt.sign(
-    { email, name: user.name },
-    process.env.JWT_SECRET as string,
-    {
-      expiresIn: '1h',
-    },
-  )
+  // Generate JWT
+  const token = generateToken({ name: user.name, email: user.email })
 
-  return NextResponse.json({ token }, { status: 200 })
+  // Set cookie with HttpOnly and Secure attributes
+  const response = NextResponse.json(
+    { message: '로그인 성공' },
+    { status: 200 },
+  )
+  response.cookies.set('token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    path: '/',
+    maxAge: 60 * 60, // 1 hour
+  })
+
+  return response
 }
+
 export async function OPTIONS() {
   return NextResponse.json({}, { status: 200, headers: { Allow: 'POST' } })
+}
+
+export function generateToken(payload: { name: string; email: string }) {
+  if (!process.env.JWT_SECRET) {
+    throw new Error('JWT_SECRET is not defined')
+  }
+
+  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' })
 }

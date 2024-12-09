@@ -40,6 +40,15 @@ a {
   text-decoration: none;
 }
 
+header {
+  position: relative;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  background-color: #353535;
+  border-bottom: 0.5px solid rgba(234, 234, 234, 0.5);
+}
+
 @media (prefers-color-scheme: dark) {
   html {
     color-scheme: dark;

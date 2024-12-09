@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { connectDB } from '@/app/utils/connecter'
 import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
 import User from '@/app/utils/models/User'
+import { generateToken } from '../auth/login/route'
 
 export async function POST(req: NextRequest) {
   await connectDB()
@@ -25,9 +25,7 @@ export async function POST(req: NextRequest) {
   User.insertMany(newUser)
 
   // Generate JWT
-  const token = jwt.sign({ email }, process.env.JWT_SECRET as string, {
-    expiresIn: '1h',
-  })
+  const token = generateToken({ name, email })
 
   return NextResponse.json({ token }, { status: 201 })
 }

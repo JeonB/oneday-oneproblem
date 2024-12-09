@@ -1,4 +1,4 @@
-import Login from '@/components/ui/Login'
+import Login from '@/components/ui/login'
 
 export const description = 'A simple login form.'
 
