@@ -83,7 +83,8 @@ const MainPage: React.FC = () => {
             src="/images/logo.png"
             alt="logo"
             width={150}
-            height={100}
+            height={0}
+            style={{ width: 'auto', height: '100px' }}
             className="hidden rounded-lg md:block"
           />
           <div className="mt-4 flex flex-col items-center">

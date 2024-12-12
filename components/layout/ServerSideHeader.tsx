@@ -22,7 +22,12 @@ export default async function Header() {
   return (
     <ClientHeader user={user}>
       <Link href="/">
-        <Image src={logoImg} alt="logo" priority />
+        <Image
+          src={logoImg}
+          alt="logo"
+          priority
+          className="h-8 w-auto md:h-12 xl:h-16"
+        />
       </Link>
     </ClientHeader>
   )
