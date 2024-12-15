@@ -26,7 +26,7 @@ export default async function Header() {
           src={logoImg}
           alt="logo"
           priority
-          className="h-8 w-auto md:h-12 xl:h-16"
+          className="h-10 w-auto rounded-xl p-2 md:h-14 xl:h-16"
         />
       </Link>
     </ClientHeader>

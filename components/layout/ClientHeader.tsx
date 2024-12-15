@@ -47,7 +47,7 @@ export default function ClientHeader({ children, user }: ClientHeaderProps) {
   }, [session, status])
 
   if (isLoading) {
-    return <div>Loading...</div>
+    return null
   }
 
   return (
@@ -62,22 +62,22 @@ export default function ClientHeader({ children, user }: ClientHeaderProps) {
                 {session?.user?.email}님 환영합니다.
               </Link>
             </li>
-            <Button variant="link" asChild onClick={onLogout}>
-              <li className={classes.li}>
+            <li className={classes.li}>
+              <Button variant="link" asChild onClick={onLogout}>
                 <Link className={classes.a} href="/">
                   로그아웃
                 </Link>
-              </li>
-            </Button>
+              </Button>
+            </li>
           </>
         ) : (
-          <Button variant="link" asChild>
-            <li className={classes.li}>
+          <li className={classes.li}>
+            <Button variant="link" asChild>
               <Link className={classes.a} href="/login">
                 로그인/회원가입
               </Link>
-            </li>
-          </Button>
+            </Button>
+          </li>
         )}
       </ul>
     </nav>
