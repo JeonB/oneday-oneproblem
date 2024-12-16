@@ -20,7 +20,7 @@ export default async function Header() {
 
   const user = decoded ? { name: decoded.name } : null
   return (
-    <ClientHeader user={user}>
+    <ClientHeader>
       <Link href="/">
         <Image
           src={logoImg}

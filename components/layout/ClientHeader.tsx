@@ -10,18 +10,11 @@ import { useStore } from '../context/StoreContext'
 import { useAuthStore } from '@/components/context/Store'
 import { useEffect, useState } from 'react'
 
-interface ClientHeaderProps {
+export default function ClientHeader({
+  children,
+}: {
   children: React.ReactNode
-  user: { name: string } | null
-}
-type sessionProps = {
-  user: {
-    name: string
-    email: string
-  }
-}
-
-export default function ClientHeader({ children, user }: ClientHeaderProps) {
+}) {
   const router = useRouter()
   // const user = useUser()
   // const { loginState } = useStore()

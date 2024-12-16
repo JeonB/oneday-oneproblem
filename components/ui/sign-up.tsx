@@ -45,9 +45,6 @@ const SignUp: React.FC = () => {
       const data = await response.json()
       console.log('User signed up successfully:', data)
 
-      // Store the JWT in localStorage
-      localStorage.setItem('token', data.token)
-
       showAlertDialog()
       router.push('/')
     } catch (err) {
