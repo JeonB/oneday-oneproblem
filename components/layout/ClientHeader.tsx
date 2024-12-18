@@ -51,7 +51,7 @@ export default function ClientHeader({
         {loginState ? (
           <>
             <li className={classes.li}>
-              <Link className={classes.a} href="/">
+              <Link className={classes.a} href="/profile">
                 {session?.user?.email}님 환영합니다.
               </Link>
             </li>
