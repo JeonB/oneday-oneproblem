@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Button } from '../ui/button'
 import classes from './header.module.css'
-import { useUser } from '@/app/utils/auth'
 import { signOut, useSession } from 'next-auth/react'
 import { useStore } from '../context/StoreContext'
 import { useAuthStore } from '@/components/context/Store'
@@ -12,8 +11,10 @@ import { useEffect, useState } from 'react'
 
 export default function ClientHeader({
   children,
+  user,
 }: {
   children: React.ReactNode
+  user: { name: string } | null
 }) {
   const router = useRouter()
   // const user = useUser()
@@ -37,7 +38,7 @@ export default function ClientHeader({
       setLoginState(!!session && status === 'authenticated')
       setIsLoading(false)
     }
-  }, [session, status])
+  }, [session, status, user])
 
   if (isLoading) {
     return null
@@ -48,11 +49,11 @@ export default function ClientHeader({
       {children}
 
       <ul className={classes.ul}>
-        {loginState ? (
+        {loginState && !!user ? (
           <>
             <li className={classes.li}>
               <Link className={classes.a} href="/profile">
-                {session?.user?.email}님 환영합니다.
+                {user.name}님 환영합니다.
               </Link>
             </li>
             <li className={classes.li}>

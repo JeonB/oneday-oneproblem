@@ -84,6 +84,7 @@ const MainPage: React.FC = () => {
             alt="logo"
             width={150}
             height={0}
+            priority
             style={{ width: 'auto', height: '100px' }}
             className="hidden rounded-lg md:block"
           />

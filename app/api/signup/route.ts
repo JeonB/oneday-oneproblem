@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { connectDB } from '@/app/utils/connecter'
 import bcrypt from 'bcryptjs'
-import User from '@/app/utils/models/User'
+import User, { UserProps } from '@/app/utils/models/User'
 import { generateToken } from '../auth/login/route'
 
 export async function POST(req: NextRequest) {
@@ -18,7 +18,11 @@ export async function POST(req: NextRequest) {
 
   const hashedPassword = await bcrypt.hash(password, 10)
 
-  const newUser = { name, email, password: hashedPassword }
+  const newUser = {
+    name,
+    email,
+    password: hashedPassword,
+  }
   User.insertMany(newUser)
 
   // Generate JWT

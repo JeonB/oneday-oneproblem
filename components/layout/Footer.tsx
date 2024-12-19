@@ -1,49 +1,26 @@
-import React from 'react'
-
 export const Footer = () => {
   return (
-    <div
-      style={{
-        backgroundColor: '#353535',
-        color: 'white',
-        padding: '10px 0',
-        borderTop: '0.5px solid rgba(234, 234, 234, 0.5)',
-      }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '10px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <div>
-            <div>
-              <p style={{ fontSize: '13px' }}>
-                <span className="footSpan">주소 : 서울 관악구 행운4길</span>
-              </p>
-            </div>
-
-            <div>
-              <p style={{ marginTop: '15px', fontSize: '13px' }}>
-                <span className="footSpan">대표번호 : 010-4233-5481</span>
-              </p>
-            </div>
-          </div>
-
-          <div>
-            <div>
-              <p style={{ fontSize: '13px' }}>
-                <span className="footSpan">
-                  본 사이트의 콘텐츠는 저작권법의 보호를 받으며, 무단 전재,
-                  복사, 재배포 등을 금합니다.
-                </span>
-              </p>
-            </div>
-            <div style={{ marginTop: '15px' }}>
-              <p style={{ fontSize: '13px' }}>
-                <span className="footSpan">
-                  &copy; 2001 - {new Date().getFullYear()} JeonB All Rights
-                  Reserved.
-                </span>
-              </p>
-            </div>
-          </div>
+    <div className="mx-auto flex max-w-4xl justify-between">
+      <div className="px-4">
+        <div>
+          <p className="text-xs md:text-sm">주소 : 서울 관악구 행운4길</p>
         </div>
+
+        <div>
+          <p className="mt-4 text-xs md:text-sm">대표번호 : 010-4233-5481</p>
+        </div>
+      </div>
+
+      <div className="pr-4">
+        <div>
+          <p className="text-xs md:text-sm">
+            본 사이트의 콘텐츠는 저작권법의 보호를 받으며, 무단 전재, 복사,
+            재배포 등을 금합니다.
+          </p>
+        </div>
+        <p className="mt-4 text-xs md:text-sm">
+          &copy; 2001 - {new Date().getFullYear()} JeonB All Rights Reserved.
+        </p>
       </div>
     </div>
   )

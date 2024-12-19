@@ -1,9 +1,11 @@
 import mongoose, { Document, Schema } from 'mongoose'
 
-export interface UserProps extends Document {
+export interface UserProps {
   name: string
   email: string
   password: string
+  problemSolveStreak: number
+  problemSolveCount: number
 }
 
 const UserSchema: Schema = new mongoose.Schema({
@@ -19,6 +21,15 @@ const UserSchema: Schema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
+  },
+
+  problemSolveStreak: {
+    type: Number,
+    default: 0,
+  },
+  problemSolveCount: {
+    type: Number,
+    default: 0,
   },
 })
 
