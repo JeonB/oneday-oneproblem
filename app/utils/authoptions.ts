@@ -1,38 +1,59 @@
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
+import User, { UserProps } from '@/app/utils/models/User'
+import { connectDB } from '@/app/utils/connecter'
+import bcrypt from 'bcryptjs'
+import jwt from 'jsonwebtoken'
 
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
-        name: { label: 'UserName', type: 'text' },
         email: { label: 'UserEmail', type: 'text' },
         password: { label: 'Password', type: 'password' },
       },
-      authorize(credentials: any, req) {
-        // database operations
+      authorize: async (credentials: any) => {
+        await connectDB()
+
+        const { email, password } = credentials
+        const user = (await User.findOne({ email })) as UserProps | null
+
+        if (!user) {
+          throw new Error('아이디 또는 비밀번호가 일치하지 않습니다')
+        }
+
+        // Check password
+        const isPasswordValid = await bcrypt.compare(password, user.password)
+        if (!isPasswordValid) {
+          throw new Error('아이디 또는 비밀번호가 일치하지 않습니다')
+        }
+
+        // Return user object
         return {
-          id: '1',
-          name: credentials.name,
-          email: credentials.email,
+          id: user._id.toString(),
+          name: user.name,
+          email: user.email,
         }
       },
     }),
   ],
   callbacks: {
     async session({ session, token }) {
-      session.user = token.user as {
-        name?: string | null
-        email?: string | null
+      if (session.user) {
+        session.user.name = token.name
+        session.user.email = token.email
       }
       return session
     },
     async jwt({ token, user }) {
       if (user) {
-        token.user = user
+        token.name = user.name
+        token.id = user.id
+        token.email = user.email
       }
       return token
     },
   },
+  secret: process.env.NEXTAUTH_SECRET,
 }

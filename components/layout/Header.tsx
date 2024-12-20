@@ -5,27 +5,19 @@ import { useRouter } from 'next/navigation'
 import { Button } from '../ui/button'
 import classes from './header.module.css'
 import { signOut, useSession } from 'next-auth/react'
-import { useStore } from '../context/StoreContext'
+import Image from 'next/image'
+import logoImg from '@/public/images/logo.png'
 import { useAuthStore } from '@/components/context/Store'
 import { useEffect, useState } from 'react'
 
-export default function ClientHeader({
-  children,
-  user,
-}: {
-  children: React.ReactNode
-  user: { name: string } | null
-}) {
+export default function Header() {
   const router = useRouter()
-  // const user = useUser()
-  // const { loginState } = useStore()
   const { data: session, status } = useSession()
   const { loginState, setLoginState } = useAuthStore()
   const [isLoading, setIsLoading] = useState(true)
 
   const onLogout = async () => {
-    await signOut({ callbackUrl: '/' })
-    await fetch('/api/auth/logout', { method: 'POST' })
+    await signOut({ redirect: false })
     setLoginState(false)
     alert('로그아웃 되었습니다.')
     router.push('/')
@@ -35,10 +27,9 @@ export default function ClientHeader({
     if (status === 'loading') {
       setIsLoading(true)
     } else {
-      setLoginState(!!session && status === 'authenticated')
       setIsLoading(false)
     }
-  }, [session, status, user])
+  }, [status])
 
   if (isLoading) {
     return null
@@ -46,14 +37,21 @@ export default function ClientHeader({
 
   return (
     <nav className={classes.nav}>
-      {children}
+      <Link href="/">
+        <Image
+          src={logoImg}
+          alt="logo"
+          priority
+          className="h-10 w-auto rounded-xl p-2 md:h-14 xl:h-16"
+        />
+      </Link>
 
       <ul className={classes.ul}>
-        {loginState && !!user ? (
+        {loginState ? (
           <>
             <li className={classes.li}>
               <Link className={classes.a} href="/profile">
-                {user.name}님 환영합니다.
+                {session?.user?.name}님 환영합니다.
               </Link>
             </li>
             <li className={classes.li}>

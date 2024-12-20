@@ -1,26 +1,24 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { jwtVerify } from 'jose'
-
+import { getToken } from 'next-auth/jwt'
 export async function middleware(req: NextRequest) {
-  const token = req.cookies.get('token')?.value // 쿠키에서 토큰 추출
+  const token = req.cookies.get('next-auth.session-token')?.value // 쿠키에서 토큰 추출
   if (!token) {
+    console.log('No token found, redirecting to login page.')
     // 토큰이 없으면 로그인 페이지로 리디렉션
     return NextResponse.redirect(new URL('/login', req.url))
   }
-  const secretKey = process.env.JWT_SECRET?.trim()
+  const secretKey = process.env.NEXTAUTH_SECRET?.trim()
   if (!secretKey) {
-    throw new Error('JWT_SECRET is not defined in the environment variables.')
+    throw new Error(
+      'NEXTAUTH_SECRET is not defined in the environment variables.',
+    )
   }
   try {
-    // 토큰 검증
-    const secret = new TextEncoder().encode(secretKey)
-    const { payload } = await jwtVerify(token, secret)
-    // req.headers.set('user', JSON.stringify(payload)) // 사용자 정보를 헤더에 추가
+    const payload = getToken({ req, secret: secretKey })
     return NextResponse.next()
   } catch (err) {
-    console.error(err)
-    // 토큰이 유효하지 않은 경우 로그인 페이지로 리디렉션
+    console.error('Invalid token:', err)
     return NextResponse.redirect(new URL('/login', req.url))
   }
 }
