@@ -90,7 +90,7 @@ const ProblemPage = () => {
 
       fetchProblem()
     }
-  }, [topic])
+  }, [topic, setAiGeneratedContent])
   return (
     <>
       {loading ? (

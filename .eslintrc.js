@@ -53,5 +53,6 @@ module.exports = {
     '@typescript-eslint/no-unsafe-argument': 'off',
     '@typescript-eslint/no-var-requires': 'off',
     'react/react-in-jsx-scope': 'off',
+    'prettier/prettier': 'error',
   },
 }
