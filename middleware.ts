@@ -2,7 +2,11 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 export async function middleware(req: NextRequest) {
-  const token = req.cookies.get('next-auth.session-token')?.value // 쿠키에서 토큰 추출
+  const isProduction = process.env.NODE_ENV === 'production'
+  const tokenName = isProduction
+    ? '__Secure-next-auth.session-token'
+    : 'next-auth.session-token'
+  const token = req.cookies.get(tokenName)?.value // 쿠키에서 토큰 추출
   if (!token) {
     console.log('No token found, redirecting to login page.')
     // 토큰이 없으면 로그인 페이지로 리디렉션
