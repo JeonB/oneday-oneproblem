@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useStore } from './context/StoreContext'
-import generateFeedback from '@/app/utils/generateFeedback.mjs'
+import generateFeedback from '@/app/lib/generateFeedback.mjs'
 
 type TestResult = {
   input: any[]

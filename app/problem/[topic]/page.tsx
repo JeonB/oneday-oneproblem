@@ -1,7 +1,7 @@
 'use client'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { generateProblem } from '../../utils/generateProblem.mjs'
+import { generateProblem } from '../../lib/generateProblem.mjs'
 import CodeEditor from '@/components/CodeEditor'
 import ResultDisplay from '@/components/ResultDisplay'
 import { useStore, AiGeneratedContent } from '@/components/context/StoreContext'

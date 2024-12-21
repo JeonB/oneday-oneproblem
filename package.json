@@ -24,6 +24,7 @@
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "eslint-config-prettier": "^9.1.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.468.0",
     "mongoose": "^8.8.3",
@@ -36,6 +37,7 @@
     "react-resizable-panels": "^0.0.63",
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
+    "use-debounce": "^10.0.4",
     "zod": "^3.24.1",
     "zustand": "^5.0.2"
   },

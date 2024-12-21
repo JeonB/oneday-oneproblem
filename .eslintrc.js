@@ -3,7 +3,17 @@ module.exports = {
     browser: true,
     es2021: true,
   },
-  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'plugin:prettier/recommended', 'plugin:react/recommended', 'prettier', 'plugin:storybook/recommended'],
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:prettier/recommended',
+    'plugin:react/recommended',
+    'prettier',
+    'plugin:storybook/recommended',
+    'next/core-web-vitals',
+    'next/typescript',
+    'next',
+  ],
   overrides: [
     {
       env: {

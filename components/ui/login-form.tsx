@@ -12,24 +12,25 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import React from 'react'
 import { signIn } from 'next-auth/react'
+import { useSignInAndUpStore } from '@/components/context/Store'
+import { useDebouncedCallback } from 'use-debounce'
 
 interface LoginFormProps {
-  email?: string
-  password?: string
   error?: string
-  onEmailChange: (value: string) => void
-  onPasswordChange: (value: string) => void
   onSubmit: (e: React.FormEvent) => void
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({
-  email,
-  password,
-  error,
-  onEmailChange,
-  onPasswordChange,
-  onSubmit,
-}) => {
+const LoginForm: React.FC<LoginFormProps> = ({ error, onSubmit }) => {
+  const { setEmail, setPassword } = useSignInAndUpStore()
+
+  const debouncedSetEmail = useDebouncedCallback((value: string) => {
+    setEmail(value)
+  }, 300)
+
+  const debouncedSetPassword = useDebouncedCallback((value: string) => {
+    setPassword(value)
+  }, 300)
+
   return (
     <form onSubmit={onSubmit}>
       <Card className="mx-auto max-w-sm">
@@ -44,8 +45,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
               <Input
                 id="email"
                 type="email"
-                value={email}
-                onChange={e => onEmailChange(e.target.value)}
+                onChange={e => debouncedSetEmail(e.target.value)}
                 placeholder="m@example.com"
                 required
               />
@@ -62,8 +62,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
               <Input
                 id="password"
                 type="password"
-                value={password}
-                onChange={e => onPasswordChange(e.target.value)}
+                onChange={e => debouncedSetPassword(e.target.value)}
                 required
               />
             </div>

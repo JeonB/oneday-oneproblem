@@ -12,32 +12,31 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useSignInAndUpStore } from '@/components/context/Store'
+import { useDebouncedCallback } from 'use-debounce'
 
 interface SignUpFormProps {
-  name: string
-  email: string
-  password: string
-  // confirmPassword: string
   error: string
-  onNameChange: (value: string) => void
-  onEmailChange: (value: string) => void
-  onPasswordChange: (value: string) => void
-  // onConfirmPasswordChange: (value: string) => void
   onSubmit: (e: React.FormEvent) => void
 }
 
 export const CardsCreateAccount: React.FC<SignUpFormProps> = ({
-  name,
-  email,
-  password,
-  // confirmPassword,
   error,
-  onNameChange,
-  onEmailChange,
-  onPasswordChange,
-  // onConfirmPasswordChange,
   onSubmit,
 }) => {
+  const { setName, setEmail, setPassword } = useSignInAndUpStore()
+
+  const debouncedSetName = useDebouncedCallback((value: string) => {
+    setName(value)
+  }, 300)
+
+  const debouncedSetEmail = useDebouncedCallback((value: string) => {
+    setEmail(value)
+  }, 300)
+
+  const debouncedSetPassword = useDebouncedCallback((value: string) => {
+    setPassword(value)
+  }, 300)
   return (
     <form onSubmit={onSubmit}>
       <Card className="mx-auto w-full max-w-lg p-6 lg:max-w-xl">
@@ -71,8 +70,7 @@ export const CardsCreateAccount: React.FC<SignUpFormProps> = ({
             <Input
               id="name"
               placeholder="홍길동"
-              value={name}
-              onChange={e => onNameChange(e.target.value)}
+              onChange={e => debouncedSetName(e.target.value)}
             />
           </div>
           <div className="grid gap-4">
@@ -80,9 +78,8 @@ export const CardsCreateAccount: React.FC<SignUpFormProps> = ({
             <Input
               id="email"
               type="email"
-              value={email}
               placeholder="m@example.com"
-              onChange={e => onEmailChange(e.target.value)}
+              onChange={e => debouncedSetEmail(e.target.value)}
             />
           </div>
           <div className="grid gap-4">
@@ -90,8 +87,7 @@ export const CardsCreateAccount: React.FC<SignUpFormProps> = ({
             <Input
               id="password"
               type="password"
-              value={password}
-              onChange={e => onPasswordChange(e.target.value)}
+              onChange={e => debouncedSetPassword(e.target.value)}
             />
           </div>
         </CardContent>

@@ -1,5 +1,5 @@
-import Algorithms from '@/app/utils/models/Algorithms'
-import { connectDB } from '@/app/utils/connecter'
+import Algorithms from '@/app/lib/models/Algorithms'
+import { connectDB } from '@/app/lib/connecter'
 import { startSession } from 'mongoose'
 import { NextRequest, NextResponse } from 'next/server'
 

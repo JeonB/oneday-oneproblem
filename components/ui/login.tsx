@@ -4,11 +4,12 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import LoginForm from './login-form'
 import { signIn } from 'next-auth/react'
+import { useSignInAndUpStore } from '../context/Store'
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const { email, password } = useSignInAndUpStore()
   const [error, setError] = useState('')
+
   const router = useRouter()
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -30,16 +31,7 @@ const Login: React.FC = () => {
     }
   }
 
-  return (
-    <LoginForm
-      email={email}
-      password={password}
-      error={error}
-      onEmailChange={setEmail}
-      onPasswordChange={setPassword}
-      onSubmit={handleLogin}
-    />
-  )
+  return <LoginForm error={error} onSubmit={handleLogin} />
 }
 
 export default Login
