@@ -8,12 +8,21 @@ importers:
 
   .:
     dependencies:
+      '@codemirror/lang-cpp':
+        specifier: ^6.0.2
+        version: 6.0.2
+      '@codemirror/lang-java':
+        specifier: ^6.0.1
+        version: 6.0.1
       '@codemirror/lang-javascript':
         specifier: ^6.2.2
         version: 6.2.2
       '@codemirror/lang-markdown':
         specifier: ^6.3.0
         version: 6.3.1
+      '@codemirror/lang-python':
+        specifier: ^6.1.6
+        version: 6.1.6
       '@codemirror/language-data':
         specifier: ^6.5.1
         version: 6.5.1
