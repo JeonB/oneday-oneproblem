@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { AiGeneratedContent } from '@/components/context/StoreContext'
 
 // AI가 생성한 테스트 케이스 파싱
-export const parseTestCases = (aiGeneratedContent: AiGeneratedContent[]) => {
+const parseTestCases = (aiGeneratedContent: AiGeneratedContent[]) => {
   const testCases: { input: any[]; output: any }[] = []
 
   const content = aiGeneratedContent.slice(1)
@@ -19,7 +19,7 @@ export const parseTestCases = (aiGeneratedContent: AiGeneratedContent[]) => {
 }
 
 // 추가적인 테스트 케이스 생성
-export const generateDynamicTestCases = (
+const generateDynamicTestCases = (
   constraints: { min: number; max: number; length: number },
   solution: (...args: any[]) => any,
 ) => {
@@ -45,7 +45,7 @@ export const generateDynamicTestCases = (
 }
 
 // 깊은 비교 함수 (배열 포함)
-export const deepEqual = (a: any, b: any): boolean => {
+const deepEqual = (a: any, b: any): boolean => {
   if (Array.isArray(a) && Array.isArray(b)) {
     return (
       a.length === b.length && a.every((val, index) => deepEqual(val, b[index]))
