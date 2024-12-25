@@ -20,7 +20,10 @@ const geistMono = localFont({
 })
 
 export const metadata: Metadata = {
-  title: '1일 1문제',
+  title: {
+    template: '%s | 1일 1문제',
+    default: '1일 1문제',
+  },
   description: '하루에 한 문제씩 알고리즘 문제를 풀어보세요!',
 }
 

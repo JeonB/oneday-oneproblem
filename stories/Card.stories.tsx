@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
-import Card from '@/components/ui/AlgorithmCard'
+import Card from '@/components/ui/problem/AlgorithmCard'
 
 const meta: Meta<typeof Card> = {
   title: 'Example/Card', // Storybook에서 보여줄 컴포넌트의 이름

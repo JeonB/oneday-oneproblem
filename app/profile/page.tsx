@@ -1,4 +1,4 @@
-import { ProfileForm } from '@/components/ui/Pofile'
+import { ProfileForm } from '@/components/ui/profile/Profile'
 
 export default function Page() {
   return (

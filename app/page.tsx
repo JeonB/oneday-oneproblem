@@ -2,7 +2,7 @@
 import { useRouter } from 'next/navigation'
 import React from 'react'
 import Image from 'next/image'
-import Card from '@/components/ui/AlgorithmCard'
+import Card from '@/components/ui/problem/AlgorithmCard'
 import { Button } from '@/components/ui/button'
 
 const algorithms = [

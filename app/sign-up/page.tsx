@@ -1,4 +1,4 @@
-import SignUp from '@/components/ui/sign-up'
+import SignUp from '@/components/ui/sign-up/sign-up'
 export default function CreateAccount() {
   return (
     <div className="flex h-screen items-center justify-center">

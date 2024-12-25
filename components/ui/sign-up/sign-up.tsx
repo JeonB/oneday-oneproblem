@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import CardsCreateAccount from './sign-up-form'
 import { useRouter } from 'next/navigation'
-import { useSignInAndUpStore } from '../context/Store'
+import { useSignInAndUpStore } from '../../context/Store'
 import { signIn } from 'next-auth/react'
 
 const SignUp: React.FC = () => {
