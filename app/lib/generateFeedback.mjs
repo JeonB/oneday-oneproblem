@@ -9,7 +9,7 @@ export async function generateFeedback(code) {
   - 시간복잡도 분석
   - 더 나은 최적화 방법이 있으면 제안
   - 가독성이나 코드 스타일 향상에 대한 제안
-  - 최종적으로 다음과 같은 형태로 응답해야 돼. "timeComplexity": "O(n)",
+  - 최종적으로 다음과 같은 예시 형태로 응답해야 돼. "timeComplexity": "O(n)",
   "feedback": {
     "efficiency": "더 나은 시간 효율성을 위해 Heap을 사용해보세요.",
     "readability": "'a'같은 변수보다는 'sum'처럼 변수의 의미를 알기 쉽게 변경해보세요."

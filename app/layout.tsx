@@ -34,10 +34,6 @@ export default async function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <head>
-        <link rel="icon" href="/images/favicon.ico" />
-      </head>
-
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
         <NextAuthSessionProvider>
           <OneDayProvider>
