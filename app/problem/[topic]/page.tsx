@@ -1,7 +1,7 @@
 'use client'
 import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { generateProblem } from '../../lib/generateProblem.mjs'
+import { generateProblem } from '@/app/lib/generateProblem'
 import CodeEditor from '@/components/ui/problem/CodeEditor'
 import ResultDisplay from '@/components/ui/problem/ResultDisplay'
 import { useStore, AiGeneratedContent } from '@/components/context/StoreContext'
@@ -9,48 +9,33 @@ import LoadingPage from './loading-out'
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 
 const cleanHTMLResponse = (response: string) => {
-  // ```html와 같은 코드 태그 제거
   response = response.replace(/```html|```/g, '')
-
-  // 특정 섹션들 간에만 줄바꿈을 추가하여 가독성 개선
   response = response.replaceAll(
     /(문제 설명|제한 사항|입출력 예시|입출력 예 설명|입출력 예:\s.*?)/g,
     '<br>$1<br><br>',
   )
-
-  // 표의 셀에 Tailwind CSS 클래스 추가
   response = response.replace(
     /<table>/g,
     '<table class="table-auto w-full border-collapse">',
   )
   response = response.replace(/<th>/g, '<th class="px-4 py-2 border">')
   response = response.replace(/<td>/g, '<td class="px-4 py-2 border">')
-
   return response
 }
 
 const parseInputOutputExamples = (inputOutputExample: string) => {
   const examples: AiGeneratedContent[] = []
-
-  // 블록 단위로 분리 (빈 줄 기준으로 구분)
   const blocks = inputOutputExample.split(/\n\s*\n/).filter(Boolean)
-
   blocks.forEach(block => {
-    // 각 블록을 줄 단위로 나누고, 공백 라인을 제거
     const lines = block
       .trim()
       .split('\n')
       .map(line => line.trim())
       .filter(Boolean)
-
-    // 마지막 줄은 출력값으로, 나머지 줄은 입력값으로 설정
     const output = lines.pop()
     const input = lines
-
-    // input이 배열의 형태로 변환될 수 있게 함
     examples.push({ input, output })
   })
-
   return examples
 }
 
@@ -60,41 +45,58 @@ const ProblemPage = () => {
   const { setAiGeneratedContent } = useStore()
   const [problem, setProblem] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (topic) {
       const fetchProblem = async () => {
         setLoading(true)
-        const generatedProblem = await generateProblem(topic as string)
-        const cleanedProblem = generatedProblem
-          ? cleanHTMLResponse(generatedProblem)
-          : ''
-        setProblem(cleanedProblem)
-        const parser = new DOMParser()
-        const doc = parser.parseFromString(cleanedProblem, 'text/html')
+        setError(null) // 초기화
+        try {
+          const generatedProblem = await generateProblem(
+            topic as string,
+            '어려움',
+          )
+          const cleanedProblem = generatedProblem
+            ? cleanHTMLResponse(generatedProblem)
+            : ''
+          setProblem(cleanedProblem)
 
-        // 입출력 예시 추출
-        const inputOutputExampleHeader = Array.from(
-          doc.querySelectorAll('h2'),
-        ).find(element => element.textContent?.includes('입출력 예시'))
-        const inputOutputExampleElement =
-          inputOutputExampleHeader?.nextElementSibling
-        const inputOutputExample = inputOutputExampleElement
-          ? inputOutputExampleElement.textContent?.trim()
-          : ''
-        const inputOutput = parseInputOutputExamples(inputOutputExample || '')
-        // AI가 생성한 내용을 상태로 설정
-        setAiGeneratedContent(inputOutput)
-        setLoading(false)
+          const parser = new DOMParser()
+          const doc = parser.parseFromString(cleanedProblem, 'text/html')
+
+          // 입출력 예시 추출
+          const inputOutputExampleHeader = Array.from(
+            doc.querySelectorAll('h3'),
+          ).find(element => element.textContent?.includes('입출력 예시'))
+
+          const inputOutputExampleElement =
+            inputOutputExampleHeader?.nextElementSibling
+          const inputOutputExample = inputOutputExampleElement
+            ? inputOutputExampleElement.textContent?.trim()
+            : ''
+          const inputOutput = parseInputOutputExamples(inputOutputExample || '')
+
+          // AI가 생성한 내용을 상태로 설정
+          setAiGeneratedContent(inputOutput)
+        } catch (err) {
+          setError('문제 생성 중 오류가 발생했습니다. 다시 시도해주세요.')
+          console.error('Error fetching problem:', err)
+        } finally {
+          setLoading(false)
+        }
       }
 
       fetchProblem()
     }
   }, [topic, setAiGeneratedContent])
+
   return (
     <>
       {loading ? (
         <LoadingPage />
+      ) : error ? (
+        <div className="p-4 text-red-500">{error}</div>
       ) : (
         <PanelGroup direction="horizontal">
           <Panel defaultSizePercentage={50} minSizePercentage={30}>

@@ -27,11 +27,11 @@ const generateDynamicTestCases = (
 
   for (let i = 0; i < 5; i++) {
     // 입력값 생성
-    const length = Math.floor(Math.random() * (constraints.length - 1)) + 1
+    const length = Math.floor(Math.random() * constraints.length) + 1 // 길이 제한 설정
     const input = Array.from(
       { length },
       () =>
-        Math.floor(Math.random() * (constraints.max - constraints.min)) +
+        Math.floor(Math.random() * (constraints.max - constraints.min + 1)) +
         constraints.min,
     )
 
@@ -78,12 +78,12 @@ export async function POST(req: NextRequest) {
     }
 
     // 내부적으로 동적 테스트 케이스 생성 및 검증
-    const dynamicTestCases = generateDynamicTestCases(constraints, solution)
-    for (const { input, output } of dynamicTestCases) {
-      const result = solution(...input)
-      const passed = deepEqual(result, output)
-      results.push({ input, output, result, passed })
-    }
+    // const dynamicTestCases = generateDynamicTestCases(constraints, solution)
+    // for (const { input, output } of dynamicTestCases) {
+    //   const result = solution(...input)
+    //   const passed = deepEqual(result, output)
+    //   results.push({ input, output, result, passed })
+    // }
 
     return NextResponse.json({ results }, { status: 200 })
   } catch (error) {
