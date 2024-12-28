@@ -1,6 +1,6 @@
-import mongoose, { Document, Schema } from 'mongoose'
+import mongoose, { Schema } from 'mongoose'
 
-export interface Algorithms extends Document {
+export interface Algorithm {
   name: string
   topic: string
   img: string
@@ -13,4 +13,4 @@ const Algorithms: Schema = new Schema({
 })
 
 export default mongoose.models.Algorithms ||
-  mongoose.model<Algorithms>('Algorithms', Algorithms)
+  mongoose.model<Algorithm>('Algorithms', Algorithms)

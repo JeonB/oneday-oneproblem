@@ -1,5 +1,5 @@
 'use client'
-import { useParams } from 'next/navigation'
+import { useParams, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { generateProblem } from '@/app/lib/generateProblem'
 import CodeEditor from '@/components/ui/problem/CodeEditor'
@@ -40,8 +40,9 @@ const parseInputOutputExamples = (inputOutputExample: string) => {
 }
 
 const ProblemPage = () => {
-  const searchParams = useParams()
-  const topic = searchParams['topic']
+  const { topic } = useParams()
+  const searchParams = useSearchParams()
+  const difficulty = searchParams.get('difficulty') || 'normal'
   const { setAiGeneratedContent } = useStore()
   const [problem, setProblem] = useState<string>('')
   const [loading, setLoading] = useState<boolean>(true)
@@ -55,7 +56,7 @@ const ProblemPage = () => {
         try {
           const generatedProblem = await generateProblem(
             topic as string,
-            '어려움',
+            difficulty,
           )
           const cleanedProblem = generatedProblem
             ? cleanHTMLResponse(generatedProblem)
@@ -89,7 +90,7 @@ const ProblemPage = () => {
 
       fetchProblem()
     }
-  }, [topic, setAiGeneratedContent])
+  }, [topic, setAiGeneratedContent, difficulty])
 
   return (
     <>
