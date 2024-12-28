@@ -41,7 +41,6 @@ export default function Header() {
         <Image
           src={logoImg}
           alt="logo"
-          priority
           className="h-10 w-auto rounded-xl p-2 md:h-14 xl:h-16"
         />
       </Link>

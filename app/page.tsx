@@ -127,8 +127,7 @@ const MainPage: React.FC = () => {
             alt="logo"
             width={150}
             height={100}
-            priority
-            className="hidden rounded-lg md:block"
+            className="hidden h-32 w-auto rounded-lg md:block"
           />
           <div className="mt-4 flex flex-col items-center">
             <h1 className="mb-4 text-center text-3xl font-bold md:text-4xl">
