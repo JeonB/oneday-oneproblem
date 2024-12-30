@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useStore } from '../../context/StoreContext'
 import generateFeedback from '@/app/lib/generateFeedback.mjs'
 
@@ -69,13 +69,14 @@ export default function CodeExecution() {
           style={{ backgroundColor: 'blueviolet', width: '7rem' }}>
           Run Code
         </button>
-        {results.filter(result => result.passed === false).length === 0 && (
-          <button
-            onClick={submitToAI}
-            style={{ backgroundColor: 'darkmagenta', width: '9rem' }}>
-            AI에게 피드백 받기
-          </button>
-        )}
+        {results.length > 0 &&
+          results.filter(result => result.passed === false).length === 0 && (
+            <button
+              onClick={submitToAI}
+              style={{ backgroundColor: 'darkmagenta', width: '9rem' }}>
+              AI에게 피드백 받기
+            </button>
+          )}
       </div>
       <div>
         {feedback && isFeedbackOn ? (

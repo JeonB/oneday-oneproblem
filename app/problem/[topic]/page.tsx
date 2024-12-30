@@ -3,7 +3,7 @@ import { useParams, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { generateProblem } from '@/app/lib/generateProblem'
 import CodeEditor from '@/components/ui/problem/CodeEditor'
-import ResultDisplay from '@/components/ui/problem/ResultDisplay'
+import CodeExecution from '@/components/ui/problem/CodeExecution'
 import { useStore, AiGeneratedContent } from '@/components/context/StoreContext'
 import LoadingPage from './loading-out'
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
@@ -52,7 +52,7 @@ const ProblemPage = () => {
     if (topic) {
       const fetchProblem = async () => {
         setLoading(true)
-        setError(null) // 초기화
+        setError(null)
         try {
           const generatedProblem = await generateProblem(
             topic as string,
@@ -90,7 +90,8 @@ const ProblemPage = () => {
 
       fetchProblem()
     }
-  }, [topic, setAiGeneratedContent, difficulty])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <>
@@ -100,17 +101,25 @@ const ProblemPage = () => {
         <div className="p-4 text-red-500">{error}</div>
       ) : (
         <PanelGroup direction="horizontal">
-          <Panel defaultSizePercentage={50} minSizePercentage={30}>
+          <Panel defaultSizePercentage={40} minSizePercentage={30}>
             <div
               className="whitespace-normal p-4 text-left"
               dangerouslySetInnerHTML={{ __html: problem }}></div>
           </Panel>
           <PanelResizeHandle className="h-screen w-1 bg-stone-400" />
-          <Panel defaultSizePercentage={50} minSizePercentage={30}>
-            <div className="flex flex-col p-4">
-              <CodeEditor />
-              <ResultDisplay />
-            </div>
+          <Panel defaultSizePercentage={60} minSizePercentage={30}>
+            <PanelGroup direction="vertical">
+              <Panel defaultSizePercentage={60} minSizePercentage={30}>
+                <CodeEditor />
+              </Panel>
+              <PanelResizeHandle className="h-1 w-full bg-stone-400" />
+              <Panel defaultSizePercentage={40} minSizePercentage={30}>
+                <div className="p-4">
+                  <h3>실행 결과</h3>
+                  <CodeExecution />
+                </div>
+              </Panel>
+            </PanelGroup>
           </Panel>
         </PanelGroup>
       )}

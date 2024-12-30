@@ -7,8 +7,7 @@ import { python } from '@codemirror/lang-python'
 import { useStore } from '@/components/context/StoreContext'
 
 export default function CodeEditor() {
-  const codeContext = useStore()
-  const { code, setCode } = codeContext
+  const { code, setCode } = useStore()
   const [language, setLanguage] = useState('javascript')
 
   const onChange = (value: string) => {
