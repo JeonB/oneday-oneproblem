@@ -1,12 +1,13 @@
-import mongoose, { Document, Schema } from 'mongoose'
+import mongoose, { Schema } from 'mongoose'
 
 export interface UserProps {
   _id: mongoose.Types.ObjectId
   name: string
   email: string
   password: string
-  problemSolveStreak: number
-  problemSolveCount: number
+  streak: number
+  totalProblemsSolved: number
+  lastSolvedDate: string
 }
 
 const UserSchema: Schema = new mongoose.Schema({
@@ -23,14 +24,17 @@ const UserSchema: Schema = new mongoose.Schema({
     type: String,
     required: true,
   },
-
-  problemSolveStreak: {
+  streak: {
     type: Number,
     default: 0,
   },
-  problemSolveCount: {
+  totalProblemsSolved: {
     type: Number,
     default: 0,
+  },
+  lastSolvedDate: {
+    type: String,
+    default: () => new Date().toISOString().split('T')[0],
   },
 })
 
