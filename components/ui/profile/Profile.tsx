@@ -16,8 +16,9 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-
-import { useSession } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
+import { useAuthStore } from '@/components/context/Store'
+import { useRouter } from 'next/navigation'
 
 // 유효성 검사 스키마
 const profileFormSchema = z.object({
@@ -38,33 +39,62 @@ const profileFormSchema = z.object({
 
 type ProfileFormValues = z.infer<typeof profileFormSchema>
 
-interface UserStatsProps {
-  streak: number
-  totalProblemsSolved: number
+type ProfileFormProps = {
+  defaultValues: Partial<ProfileFormValues>
 }
 
-export function ProfileForm({ streak, totalProblemsSolved }: UserStatsProps) {
-  const { data: session } = useSession()
-  const defaultValues: Partial<ProfileFormValues> = {
-    username: session?.user?.name ?? '',
-    password: '',
-  }
+export function ProfileForm({ defaultValues }: ProfileFormProps) {
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues,
     mode: 'onChange',
   })
+  const { data: session } = useSession()
+  const { loginState, setLoginState } = useAuthStore()
+  const router = useRouter()
+  async function onSubmit(data: ProfileFormValues) {
+    try {
+      // 서버에 데이터 전송
+      const response = await fetch('/api/user', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: session?.user?.email,
+          name: data.username,
+          password: data.password,
+        }),
+      })
 
-  function onSubmit(data: ProfileFormValues) {
-    // 서버에 업데이트 요청
-    toast({
-      title: '프로필이 업데이트되었습니다!',
-      description: (
-        <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-          <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-    })
+      if (!response.ok) {
+        throw new Error('프로필 업데이트에 실패했습니다.')
+      }
+
+      const result = await response.json()
+
+      toast({
+        title: '프로필 업데이트 성공!',
+        description: (
+          <div className="text-center text-white">
+            <p className="font-bold">다시 로그인해주세요.</p>
+          </div>
+        ),
+        className: 'bg-green-500 text-white p-4 rounded-lg shadow-lg',
+      })
+
+      //세션을 로그아웃하고 루트 페이지로 이동
+      await signOut({ redirect: false })
+      setLoginState(false)
+      router.push('/')
+    } catch (error) {
+      toast({
+        title: '오류 발생',
+        description: (error as Error).message,
+        variant: 'destructive',
+        className: 'bg-red-500 text-white p-4 rounded-lg shadow-lg',
+      })
+    }
   }
 
   return (
@@ -74,11 +104,11 @@ export function ProfileForm({ streak, totalProblemsSolved }: UserStatsProps) {
         <FormField
           control={form.control}
           name="streak"
-          render={() => (
+          render={({ field }) => (
             <FormItem>
               <FormLabel>연속 풀이 횟수</FormLabel>
               <FormControl>
-                <Input value={streak} readOnly />
+                <Input {...field} readOnly />
               </FormControl>
               <FormDescription>
                 현재 하루 연속 문제 풀이 횟수입니다.
@@ -91,11 +121,11 @@ export function ProfileForm({ streak, totalProblemsSolved }: UserStatsProps) {
         <FormField
           control={form.control}
           name="totalProblemsSolved"
-          render={() => (
+          render={({ field }) => (
             <FormItem>
               <FormLabel>총 문제 풀이 횟수</FormLabel>
               <FormControl>
-                <Input value={totalProblemsSolved} readOnly />
+                <Input {...field} readOnly />
               </FormControl>
               <FormDescription>
                 지금까지 풀었던 문제의 총 개수입니다.

@@ -7,6 +7,7 @@ import Header from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import NextAuthSessionProvider from './providers/SessionProvider'
 import SessionLoader from './providers/SessionLoader'
+import { Toaster } from '@/components/ui/toaster'
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -44,6 +45,7 @@ export default async function RootLayout({
                 </header>
                 <div className="main-content">
                   <main>{children}</main>
+                  <Toaster />
                 </div>
                 <footer>
                   <Footer />

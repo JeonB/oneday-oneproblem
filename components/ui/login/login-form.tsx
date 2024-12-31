@@ -78,7 +78,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ error, onSubmit }) => {
             </Button>
           </div>
           <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{' '}
+            계정이 없으신가요?{' '}
             <Link href="/sign-up" className="underline">
               회원가입
             </Link>

@@ -66,8 +66,10 @@ export default function CodeExecution() {
   useEffect(() => {
     if (
       results.length > 0 &&
+      results.filter(result => result.error).length === 0 &&
       results.filter(result => result.passed === false).length === 0
     ) {
+      console.log('results', results)
       const handleProblemSolve = async () => {
         const email = session?.user?.email
         console.log('이메일', email)
