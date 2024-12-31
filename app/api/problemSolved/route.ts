@@ -20,6 +20,7 @@ export async function POST(req: NextRequest) {
 
     const today = dayjs().startOf('day').toISOString()
 
+    console.log('마지막 풀이 날짜:', userStats.lastSolvedDate, '오늘:', today)
     if (userStats.lastSolvedDate === today) {
       // 오늘 이미 문제를 푼 경우
       return NextResponse.json({

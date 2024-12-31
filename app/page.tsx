@@ -69,7 +69,7 @@ const MainPage: React.FC = () => {
       </div>
 
       {/* 알고리즘 카드 리스트 섹션 */}
-      <div className="mb-2 flex justify-center">
+      <div className="mb-10 flex justify-center">
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {algorithms.map(algorithm => (
             <Card

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useStore } from '../../context/StoreContext'
 import generateFeedback from '@/app/lib/generateFeedback.mjs'
+import { useSession } from 'next-auth/react'
 
 type TestResult = {
   input: any[]
@@ -23,6 +24,7 @@ export default function CodeExecution() {
   const [feedback, setFeedback] = useState<Feedback>()
   const [isFeedbackOn, setFeedbackOn] = useState(false)
   const constraints = { min: -100000, max: 100000, length: 100 }
+  const { data: session } = useSession()
 
   const runCode = async () => {
     setResults([])
@@ -60,6 +62,37 @@ export default function CodeExecution() {
     }
     setFeedbackOn(true)
   }
+
+  useEffect(() => {
+    if (
+      results.length > 0 &&
+      results.filter(result => result.passed === false).length === 0
+    ) {
+      const handleProblemSolve = async () => {
+        const email = session?.user?.email
+        console.log('이메일', email)
+        try {
+          const response = await fetch(`/api/problemSolved`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email }),
+          })
+
+          if (response.ok) {
+            const data = await response.json()
+            console.log('streak: ', data.streak)
+            alert('문제를 성공적으로 풀었습니다!')
+          } else {
+            throw new Error('문제 풀이 업데이트에 실패했습니다.')
+          }
+        } catch (error) {
+          console.error(error)
+          alert('문제를 푸는 데 실패했습니다.')
+        }
+      }
+      handleProblemSolve()
+    }
+  }, [results, session?.user?.email])
 
   return (
     <div>
