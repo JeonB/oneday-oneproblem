@@ -8,31 +8,16 @@ import { signOut, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import logoImg from '@/public/images/logo.png'
 import { useAuthStore } from '@/components/context/Store'
-import { useEffect, useState } from 'react'
 
 export default function Header() {
   const router = useRouter()
-  const { data: session, status } = useSession()
+  const { data: session } = useSession()
   const { loginState, setLoginState } = useAuthStore()
-  const [isLoading, setIsLoading] = useState(true)
-
   const onLogout = async () => {
     await signOut({ redirect: false })
     setLoginState(false)
     alert('로그아웃 되었습니다.')
     router.push('/')
-  }
-
-  useEffect(() => {
-    if (status === 'loading') {
-      setIsLoading(true)
-    } else {
-      setIsLoading(false)
-    }
-  }, [status])
-
-  if (isLoading) {
-    return null
   }
 
   return (
