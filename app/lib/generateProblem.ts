@@ -8,6 +8,7 @@ const openai = new OpenAI({
 export async function generateProblem(topic: string, difficulty: string) {
   const prompt = `
 다음 주제에 관한 알고리즘 문제를 한국어로 작성하세요: ${topic}. 난이도는 ${difficulty}로 설정하세요.
+${topic}이 "random"인 경우, 임의의 주제를 선택하세요.
 문제는 특정 프로그래밍 언어에 의존하지 않아야 하며, Java, JavaScript, C, C++, Python에서 해결할 수 있어야 합니다.
 아래와 같은 구조로 문제를 작성하세요:
 1. **문제 설명**: 함수 형태나 언어별 구체적인 문법을 요구하지 마세요. 함수의 목적과 반환값만 설명하세요.
@@ -23,7 +24,7 @@ export async function generateProblem(topic: string, difficulty: string) {
 
   try {
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: 'gpt-4o',
       messages: [
         {
           role: 'system',

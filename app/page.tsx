@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Algorithm } from '@/app/lib/models/Algorithms'
 import DifficultyModal from '@/components/ui/problem/DifficultyModal'
 import { useAlgorithmStore } from '@/components/context/Store'
+
 const MainPage: React.FC = () => {
   const router = useRouter()
   const { algorithms, setAlgorithms } = useAlgorithmStore()
@@ -14,6 +15,12 @@ const MainPage: React.FC = () => {
     null,
   )
   const [isModalOpen, setModalOpen] = useState(false)
+
+  const getRandomDifficulty = () => {
+    const difficulties = ['easy', 'normal', 'hard']
+    const randomIndex = Math.floor(Math.random() * difficulties.length)
+    return difficulties[randomIndex]
+  }
 
   useEffect(() => {
     const fetchAlgorithms = async () => {
@@ -61,7 +68,13 @@ const MainPage: React.FC = () => {
             <h1 className="mb-4 text-center text-3xl font-bold md:text-4xl">
               알고리즘 실력 향상을 위한 <br /> 맞춤형 학습 플랫폼
             </h1>
-            <Button className="rounded-full bg-[#43B9AA] px-6 py-2 text-white">
+            <Button
+              className="rounded-full bg-[#43B9AA] px-6 py-2 text-white"
+              onClick={() =>
+                router.push(
+                  `/problem/random?difficulty=${getRandomDifficulty()}`,
+                )
+              }>
               오늘의 문제 풀이
             </Button>
           </div>
