@@ -16,7 +16,7 @@ const MainPage: React.FC = () => {
     null,
   )
   const [isModalOpen, setModalOpen] = useState(false)
-  const [isLoading, setIsLoading] = useState(true) // 로딩 상태 추가
+  const [isLoading, setIsLoading] = useState(true)
 
   const getRandomDifficulty = () => {
     const difficulties = ['easy', 'normal', 'hard']
@@ -91,11 +91,13 @@ const MainPage: React.FC = () => {
       <div className="mb-10 flex justify-center">
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
           {isLoading
-            ? Array.from({ length: 16 }).map((_, index) => (
+            ? Array.from({
+                length: algorithms.length > 0 ? algorithms.length : 20,
+              }).map((_, index) => (
                 <Skeleton
                   key={index}
                   className="h-32 w-32 rounded-lg md:h-40 md:w-40"
-                /> // Skeleton 사용
+                />
               ))
             : algorithms.map(algorithm => (
                 <Card
