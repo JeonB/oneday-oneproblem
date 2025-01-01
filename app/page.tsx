@@ -13,7 +13,6 @@ import { useAlgorithmStore } from '@/components/context/Store'
 const MainPage: React.FC = () => {
   const router = useRouter()
   const { algorithms, isLoading, fetchAlgorithms } = useAlgorithmStore()
-  const rehydrated = useAlgorithmStore.persist.hasHydrated()
   const [selectedAlgorithm, setSelectedAlgorithm] = useState<Algorithm | null>(
     null,
   )
@@ -24,10 +23,10 @@ const MainPage: React.FC = () => {
     ['easy', 'normal', 'hard'][Math.floor(Math.random() * 3)]
 
   useEffect(() => {
-    if (rehydrated && algorithms.length === 0) {
+    if (algorithms.length === 0) {
       fetchAlgorithms()
     }
-  }, [rehydrated, algorithms, fetchAlgorithms])
+  }, [algorithms, fetchAlgorithms])
 
   // 난이도 선택 후 이동
   const handleSelectDifficulty = (difficulty: string) => {
@@ -43,8 +42,8 @@ const MainPage: React.FC = () => {
           <Image
             src="/images/logo.png"
             alt="logo"
-            width={150}
-            height={100}
+            width={140}
+            height={128}
             className="hidden h-32 w-auto rounded-lg md:block"
           />
           <div className="mt-4 flex flex-col items-center">
