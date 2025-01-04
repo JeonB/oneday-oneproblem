@@ -5,13 +5,15 @@ import { java } from '@codemirror/lang-java'
 import { cpp } from '@codemirror/lang-cpp'
 import { python } from '@codemirror/lang-python'
 import { useStore } from '@/components/context/StoreContext'
+import { useProblemStore } from '@/components/context/Store'
 
 export default function CodeEditor() {
   const { code, setCode } = useStore()
+  const { userSolution, setUserSolution } = useProblemStore()
   const [language, setLanguage] = useState('javascript')
 
   const onChange = (value: string) => {
-    setCode(value)
+    setUserSolution(value)
   }
 
   const handleLanguageChange = (
@@ -46,7 +48,7 @@ export default function CodeEditor() {
         <option value="python">Python</option>
       </select>
       <CodeMirror
-        value={code}
+        value={userSolution}
         onChange={onChange}
         height="70vh"
         theme="dark"

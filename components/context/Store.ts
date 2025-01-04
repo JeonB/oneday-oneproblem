@@ -23,6 +23,23 @@ interface AlgorithmState {
   fetchAlgorithms: () => Promise<void>
 }
 
+export type AiGeneratedContent = {
+  input: string[] | string
+  output: string | string[] | undefined
+}
+interface ProblemState {
+  topic: string
+  difficulty: string
+  inputOutput: AiGeneratedContent[]
+  userSolution: string
+  content: string
+  setTopic: (topic: string) => void
+  setDifficulty: (difficulty: string) => void
+  setInputOutput: (inputOutput: AiGeneratedContent[]) => void
+  setUserSolution: (userSolution: string) => void
+  setContent: (content: string) => void
+}
+
 export const useAuthStore = create<AuthState>()(
   persist(
     set => ({
@@ -75,3 +92,16 @@ export const useAlgorithmStore = create<AlgorithmState>()(
     },
   ),
 )
+
+export const useProblemStore = create<ProblemState>(set => ({
+  topic: '',
+  difficulty: '',
+  inputOutput: [],
+  userSolution: '',
+  content: '',
+  setTopic: topic => set({ topic }),
+  setDifficulty: difficulty => set({ difficulty }),
+  setInputOutput: inputOutput => set({ inputOutput }),
+  setUserSolution: userSolution => set({ userSolution }),
+  setContent: content => set({ content }),
+}))

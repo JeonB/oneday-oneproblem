@@ -27,7 +27,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "stories/Card.stories.tsㅌ"
+    "types/**/*.ts"
   ],
   "exclude": ["node_modules"]
 }

@@ -1,19 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { AiGeneratedContent } from '@/components/context/StoreContext'
+import { AiGeneratedContent } from '@/components/context/Store'
 
+// JSON 문자열 유효성 검사 함수
+const isValidJson = (str: string) => {
+  try {
+    JSON.parse(str)
+    return true
+  } catch (e) {
+    return false
+  }
+}
 // AI가 생성한 테스트 케이스 파싱
 const parseTestCases = (aiGeneratedContent: AiGeneratedContent[]) => {
   const testCases: { input: any[]; output: any }[] = []
 
-  const content = aiGeneratedContent.slice(1)
-  content.forEach(example => {
-    const input = Array.isArray(example.input)
-      ? example.input.map(item => JSON.parse(item))
-      : [JSON.parse(example.input as string)]
+  try {
+    const content = aiGeneratedContent.slice(1)
+    content.forEach(example => {
+      if (!example.input || !example.output) {
+        throw new Error(
+          'Invalid AI generated content: input or output is missing',
+        )
+      }
 
-    const output = JSON.parse(example.output as string)
-    testCases.push({ input, output })
-  })
+      const input = Array.isArray(example.input)
+        ? example.input.map(item =>
+            isValidJson(item) ? JSON.parse(item) : item,
+          )
+        : [
+            isValidJson(example.input as string)
+              ? JSON.parse(example.input as string)
+              : example.input,
+          ]
+
+      const output = isValidJson(example.output as string)
+        ? JSON.parse(example.output as string)
+        : example.output
+      testCases.push({ input, output })
+    })
+  } catch (e) {
+    console.error(e)
+  }
 
   return testCases
 }
@@ -55,13 +82,14 @@ const deepEqual = (a: any, b: any): boolean => {
 }
 
 export async function POST(req: NextRequest) {
-  const { code, aiGeneratedContent, constraints } = await req.json()
+  const { problemData } = await req.json()
+  const { userSolution, inputOutput, constraints } = problemData
 
   // AI가 제공한 테스트 케이스 파싱
-  const testCases = parseTestCases(aiGeneratedContent)
+  const testCases = parseTestCases(inputOutput)
 
   const wrappedCode = `
-    ${code}
+    ${userSolution}
     return solution;
   `
 

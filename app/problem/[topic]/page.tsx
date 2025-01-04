@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { generateProblem } from '@/app/lib/generateProblem'
 import CodeEditor from '@/components/ui/problem/CodeEditor'
 import CodeExecution from '@/components/ui/problem/CodeExecution'
-import { useStore, AiGeneratedContent } from '@/components/context/StoreContext'
+import { useProblemStore, AiGeneratedContent } from '@/components/context/Store'
 import LoadingPage from './loading-out'
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 
@@ -43,8 +43,8 @@ const ProblemPage = () => {
   const { topic } = useParams()
   const searchParams = useSearchParams()
   const difficulty = searchParams.get('difficulty') || 'normal'
-  const { setAiGeneratedContent } = useStore()
-  const [problem, setProblem] = useState<string>('')
+  const { content, setContent, setInputOutput, setDifficulty, setTopic } =
+    useProblemStore()
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -61,7 +61,7 @@ const ProblemPage = () => {
           const cleanedProblem = generatedProblem
             ? cleanHTMLResponse(generatedProblem)
             : ''
-          setProblem(cleanedProblem)
+          setContent(cleanedProblem)
 
           const parser = new DOMParser()
           const doc = parser.parseFromString(cleanedProblem, 'text/html')
@@ -79,7 +79,7 @@ const ProblemPage = () => {
           const inputOutput = parseInputOutputExamples(inputOutputExample || '')
 
           // AI가 생성한 내용을 상태로 설정
-          setAiGeneratedContent(inputOutput)
+          setInputOutput(inputOutput)
         } catch (err) {
           setError('문제 생성 중 오류가 발생했습니다. 다시 시도해주세요.')
           console.error('Error fetching problem:', err)
@@ -87,7 +87,8 @@ const ProblemPage = () => {
           setLoading(false)
         }
       }
-
+      setTopic(topic as string)
+      setDifficulty(difficulty)
       fetchProblem()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -104,7 +105,7 @@ const ProblemPage = () => {
           <Panel defaultSizePercentage={40} minSizePercentage={30}>
             <div
               className="whitespace-normal p-4 text-left"
-              dangerouslySetInnerHTML={{ __html: problem }}></div>
+              dangerouslySetInnerHTML={{ __html: content }}></div>
           </Panel>
           <PanelResizeHandle className="h-screen w-1 bg-stone-400" />
           <Panel defaultSizePercentage={60} minSizePercentage={30}>

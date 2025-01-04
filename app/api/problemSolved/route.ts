@@ -2,13 +2,24 @@ import { NextRequest, NextResponse } from 'next/server'
 import { connectDB } from '@/app/lib/connecter'
 import User, { UserProps } from '@/app/lib/models/User'
 import dayjs from 'dayjs'
+import Problem from '@/app/lib/models/Problem'
 
 export async function POST(req: NextRequest) {
   try {
     await connectDB()
+    const { userId, topic, difficulty, content, userSolution, email } =
+      await req.json()
+
+    const newProblem = new Problem({
+      userId,
+      topic,
+      difficulty,
+      content,
+      userSolution,
+    })
+    await newProblem.save()
 
     // 요청 데이터 가져오기
-    const { email } = (await req.json()) as { email: string }
     const userStats = (await User.findOne({ email })) as UserProps | null
 
     if (!userStats) {
@@ -20,7 +31,6 @@ export async function POST(req: NextRequest) {
 
     const today = dayjs().startOf('day').toISOString()
 
-    console.log('마지막 풀이 날짜:', userStats.lastSolvedDate, '오늘:', today)
     if (userStats.lastSolvedDate === today) {
       // 오늘 이미 문제를 푼 경우
       return NextResponse.json({
