@@ -8,21 +8,6 @@ import { useProblemStore, AiGeneratedContent } from '@/components/context/Store'
 import LoadingPage from './loading-out'
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 
-const cleanHTMLResponse = (response: string) => {
-  response = response.replace(/```html|```/g, '')
-  response = response.replaceAll(
-    /(문제 설명|제한 사항|입출력 예시|입출력 예 설명|입출력 예:\s.*?)/g,
-    '<br>$1<br><br>',
-  )
-  response = response.replace(
-    /<table>/g,
-    '<table class="table-auto w-full border-collapse">',
-  )
-  response = response.replace(/<th>/g, '<th class="px-4 py-2 border">')
-  response = response.replace(/<td>/g, '<td class="px-4 py-2 border">')
-  return response
-}
-
 const parseInputOutputExamples = (inputOutputExample: string) => {
   const examples: AiGeneratedContent[] = []
   const blocks = inputOutputExample.split(/\n\s*\n/).filter(Boolean)
@@ -58,28 +43,30 @@ const ProblemPage = () => {
             topic as string,
             difficulty,
           )
-          const cleanedProblem = generatedProblem
-            ? cleanHTMLResponse(generatedProblem)
-            : ''
-          setContent(cleanedProblem)
+          if (typeof generatedProblem === 'string') {
+            setContent(generatedProblem)
 
-          const parser = new DOMParser()
-          const doc = parser.parseFromString(cleanedProblem, 'text/html')
+            const parser = new DOMParser()
+            const doc = parser.parseFromString(generatedProblem, 'text/html')
 
-          // 입출력 예시 추출
-          const inputOutputExampleHeader = Array.from(
-            doc.querySelectorAll('h3'),
-          ).find(element => element.textContent?.includes('입출력 예시'))
+            const inputOutputExampleHeader = Array.from(
+              doc.querySelectorAll('h3'),
+            ).find(element => element.textContent?.includes('입출력 예시'))
 
-          const inputOutputExampleElement =
-            inputOutputExampleHeader?.nextElementSibling
-          const inputOutputExample = inputOutputExampleElement
-            ? inputOutputExampleElement.textContent?.trim()
-            : ''
-          const inputOutput = parseInputOutputExamples(inputOutputExample || '')
+            const inputOutputExampleElement =
+              inputOutputExampleHeader?.nextElementSibling
+            const inputOutputExample = inputOutputExampleElement
+              ? inputOutputExampleElement.textContent?.trim()
+              : ''
+            const inputOutput = parseInputOutputExamples(
+              inputOutputExample || '',
+            )
 
-          // AI가 생성한 내용을 상태로 설정
-          setInputOutput(inputOutput)
+            // AI가 생성한 테스트 케이스를 저장
+            setInputOutput(inputOutput)
+          } else {
+            throw new Error('Generated problem is not a string')
+          }
         } catch (err) {
           setError('문제 생성 중 오류가 발생했습니다. 다시 시도해주세요.')
           console.error('Error fetching problem:', err)
@@ -116,7 +103,7 @@ const ProblemPage = () => {
               <PanelResizeHandle className="h-1 w-full bg-stone-400" />
               <Panel defaultSizePercentage={40} minSizePercentage={30}>
                 <div className="p-4">
-                  <h3>실행 결과</h3>
+                  <h3 className="mb-2">실행 결과</h3>
                   <CodeExecution />
                 </div>
               </Panel>

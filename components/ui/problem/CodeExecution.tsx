@@ -1,28 +1,58 @@
 import { useEffect, useState, useCallback } from 'react'
-import { useStore } from '../../context/StoreContext'
-import generateFeedback from '@/app/lib/generateFeedback.mjs'
 import { useSession } from 'next-auth/react'
 import { useProblemStore } from '@/components/context/Store'
+import generateFeedback from '@/app/lib/generateFeedback'
+import clsx from 'clsx'
+import { Feedback, FeedbackState } from './Feedback'
+import { TestResult, ResultDisplay } from './ResultDisplay'
+import { Skeleton } from '@/components/ui/skeleton'
 
-type TestResult = {
-  input: any[]
-  output: any
-  result: any
-  passed: boolean
-  error?: string
-}
+/**
+ * CodeExecution 컴포넌트는 사용자가 코드를 실행하고 AI 피드백을 받을 수 있는 UI를 제공합니다.
+ * @component
+ */
 
-type Feedback = {
-  timeComplexity: string
-  feedback: { efficiency: string; readability: string }
-  aiImprovedCode: string
-  error?: string
-}
+/**
+ * 코드를 실행하고 결과를 설정하는 함수입니다.
+ * @function
+ * @async
+ * @name runCode
+ * @returns {Promise<void>}
+ */
 
+/**
+ * 결과 값을 포맷팅하는 함수입니다.
+ * @function
+ * @name formatResult
+ * @param {any} value - 포맷팅할 값
+ * @returns {string} 포맷팅된 값
+ */
+
+/**
+ * AI에게 피드백을 요청하는 함수입니다.
+ * @function
+ * @async
+ * @name submitToAI
+ * @returns {Promise<void>}
+ */
+
+/**
+ * 문제를 해결했을 때 서버에 업데이트하는 함수입니다.
+ * @function
+ * @async
+ * @name handleProblemSolve
+ * @returns {Promise<void>}
+ */
+
+/**
+ * 컴포넌트가 마운트될 때와 결과가 업데이트될 때 문제 해결 여부를 확인하는 useEffect 훅입니다.
+ * @function
+ * @name useEffect
+ */
 export default function CodeExecution() {
   const [results, setResults] = useState<TestResult[]>([])
-  const [feedback, setFeedback] = useState<Feedback>()
-  const [isFeedbackOn, setFeedbackOn] = useState(false)
+  const [feedback, setFeedback] = useState<FeedbackState | null>(null)
+  const [isLoadingFeedback, setLoadingFeedback] = useState(false)
   const { data: session } = useSession()
   const { topic, difficulty, content, userSolution, inputOutput } =
     useProblemStore()
@@ -31,21 +61,22 @@ export default function CodeExecution() {
   const userId = session?.user?.id
 
   const runCode = useCallback(async () => {
-    const problemData = {
-      inputOutput,
-      userSolution,
-    }
+    setFeedback(null)
+    const problemData = { inputOutput, userSolution }
     setResults([])
-    const response = await fetch('/api/executeCode', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ problemData }),
-    })
-    const data = await response.json()
-    if (data.error) {
-      setResults([{ error: data.error } as TestResult])
-    } else {
-      setResults(data.results)
+    try {
+      const response = await fetch('/api/executeCode', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ problemData }),
+      })
+      const data = await response.json()
+      setResults(
+        data.error ? [{ error: data.error } as TestResult] : data.results,
+      )
+    } catch (error) {
+      console.error('Code execution error:', error)
+      setResults([{ error: 'Code execution failed' } as TestResult])
     }
   }, [inputOutput, userSolution])
 
@@ -53,27 +84,27 @@ export default function CodeExecution() {
     Array.isArray(value) ? JSON.stringify(value) : value
 
   const submitToAI = useCallback(async () => {
-    const feedback = await generateFeedback(userSolution)
-    const generatedFeedback = feedback?.replace(/```json|```/g, '')
-
-    const response = await fetch('/api/analyzeCode', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ generatedFeedback }),
-    })
-
-    const data = await response.json()
-    if (data.error) {
-      setFeedback({ error: data.error } as Feedback)
-    } else {
-      setFeedback(data.results)
+    setLoadingFeedback(true)
+    setFeedback(null)
+    try {
+      const feedbackResponse = await generateFeedback(content, userSolution)
+      setFeedback(feedbackResponse)
+    } catch (error) {
+      console.error('Feedback generation error:', error)
+      setFeedback({
+        timeComplexity: '',
+        feedback: { efficiency: '', readability: '' },
+        aiImprovedCode: '',
+        error: 'AI 피드백 생성에 실패했습니다.',
+      })
+    } finally {
+      setLoadingFeedback(false)
     }
-    setFeedbackOn(true)
-  }, [userSolution])
+  }, [content, userSolution])
 
   const handleProblemSolve = useCallback(async () => {
     try {
-      const response = await fetch(`/api/problemSolved`, {
+      const response = await fetch('/api/problemSolved', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -87,7 +118,6 @@ export default function CodeExecution() {
       })
 
       if (response.ok) {
-        const data = await response.json()
         alert('문제를 성공적으로 풀었습니다!')
       } else {
         throw new Error('문제 풀이 업데이트에 실패했습니다.')
@@ -109,44 +139,30 @@ export default function CodeExecution() {
 
   return (
     <div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <button
-          onClick={runCode}
-          style={{ backgroundColor: 'blueviolet', width: '7rem' }}>
-          Run Code
+      <div className="flex items-center gap-4">
+        <button onClick={runCode} className="w-28 rounded-sm bg-violet-600">
+          채점하기
         </button>
         {results.length > 0 && results.every(result => result.passed) && (
           <button
             onClick={submitToAI}
-            style={{ backgroundColor: 'darkmagenta', width: '9rem' }}>
-            AI에게 피드백 받기
+            disabled={isLoadingFeedback}
+            className={clsx(
+              'w-36 rounded-sm',
+              isLoadingFeedback ? 'bg-gray-400' : 'bg-fuchsia-700',
+              'text-white',
+            )}>
+            {isLoadingFeedback ? 'Loading...' : 'AI에게 피드백 받기'}
           </button>
         )}
       </div>
       <div>
-        {feedback && isFeedbackOn ? (
-          <div>
-            <p>시간 복잡도: {feedback.timeComplexity}</p>
-            <p>효율성: {feedback.feedback.efficiency}</p>
-            <p>가독성: {feedback.feedback.readability}</p>
-            <p>개선된 코드:</p>
-            <pre>{feedback.aiImprovedCode}</pre>
-          </div>
+        {isLoadingFeedback ? (
+          <Skeleton className="h-80 w-auto md:w-5/6" />
+        ) : feedback ? (
+          <Feedback {...feedback} />
         ) : (
-          results.map((result, index) => (
-            <div key={index} style={{ color: result.passed ? 'green' : 'red' }}>
-              {result.error ? (
-                <p>Error: {result.error}</p>
-              ) : (
-                <p>
-                  Test Case {index + 1}: Expected ={' '}
-                  {formatResult(result.output)}, Got ={' '}
-                  {formatResult(result.result)},{' '}
-                  {result.passed ? 'Passed' : 'Failed'}
-                </p>
-              )}
-            </div>
-          ))
+          <ResultDisplay results={results} formatResult={formatResult} />
         )}
       </div>
     </div>
