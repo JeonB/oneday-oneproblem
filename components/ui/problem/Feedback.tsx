@@ -11,7 +11,7 @@ export const Feedback = (feedback: FeedbackState) => {
       <p>{feedback.error}</p>
     </div>
   ) : (
-    <div className="animate-fadeIn my-6 rounded-lg border border-gray-300 bg-slate-500 p-6 shadow-md md:w-5/6">
+    <div className="my-6 animate-fadeIn rounded-lg border border-gray-300 bg-slate-500 p-6 shadow-md md:w-5/6">
       <h3 className="mb-4 border-b-2 border-gray-300 pb-2 text-xl font-bold text-neutral-900">
         AI 피드백
       </h3>
