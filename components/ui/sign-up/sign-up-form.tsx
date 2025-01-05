@@ -14,6 +14,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useSignInAndUpStore } from '@/components/context/Store'
 import { useDebouncedCallback } from 'use-debounce'
+import { signIn } from 'next-auth/react'
 
 interface SignUpFormProps {
   error: string
@@ -46,11 +47,17 @@ export const CardsCreateAccount: React.FC<SignUpFormProps> = ({
         </CardHeader>
         <CardContent className="grid gap-6">
           <div className="grid grid-cols-2 gap-8">
-            <Button variant="outline">
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() => signIn('github', { callbackUrl: '/' })}>
               <Icons.gitHub />
               Github
             </Button>
-            <Button variant="outline">
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() => signIn('google', { callbackUrl: '/' })}>
               <Icons.google />
               Google
             </Button>

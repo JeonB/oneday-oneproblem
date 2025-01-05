@@ -14,6 +14,7 @@ import React from 'react'
 import { signIn } from 'next-auth/react'
 import { useSignInAndUpStore } from '@/components/context/Store'
 import { useDebouncedCallback } from 'use-debounce'
+import { Icons } from '@/components/icons'
 
 interface LoginFormProps {
   error?: string
@@ -31,9 +32,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ error, onSubmit }) => {
     setPassword(value)
   }, 300)
 
+  const handleOAuthSignIn = (provider: string) => {
+    signIn(provider, { callbackUrl: '/' })
+  }
+
   return (
     <form onSubmit={onSubmit}>
-      <Card className="mx-auto max-w-sm">
+      <Card className="mx-auto w-64 md:w-80">
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>
           <CardDescription>하단에 이메일을 입력해주세요.</CardDescription>
@@ -53,11 +58,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ error, onSubmit }) => {
             <div className="grid gap-2">
               <div className="flex items-center">
                 <Label htmlFor="password">비밀번호</Label>
-                <Link
-                  href="#"
-                  className="ml-auto inline-block text-sm underline">
-                  비밀번호를 잊으셨습니까?
-                </Link>
               </div>
               <Input
                 id="password"
@@ -65,6 +65,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ error, onSubmit }) => {
                 onChange={e => debouncedSetPassword(e.target.value)}
                 required
               />
+              <Link href="#" className="ml-auto inline-block text-sm underline">
+                비밀번호를 잊으셨습니까?
+              </Link>
             </div>
             {error && <p>{error}</p>}
             <Button type="submit" className="w-full">
@@ -73,8 +76,18 @@ const LoginForm: React.FC<LoginFormProps> = ({ error, onSubmit }) => {
             <Button
               variant="outline"
               className="w-full"
-              onClick={() => signIn('google')}>
+              type="button"
+              onClick={() => handleOAuthSignIn('google')}>
+              <Icons.google />
               Google로 로그인
+            </Button>
+            <Button
+              variant="outline"
+              type="button"
+              className="w-full"
+              onClick={() => handleOAuthSignIn('github')}>
+              <Icons.gitHub />
+              Github로 로그인
             </Button>
           </div>
           <div className="mt-4 text-center text-sm">

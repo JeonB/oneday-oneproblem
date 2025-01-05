@@ -3,6 +3,8 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import User, { UserProps } from '@/app/lib/models/User'
 import { connectDB } from '@/app/lib/connecter'
 import bcrypt from 'bcryptjs'
+import GoogleProvider from 'next-auth/providers/google'
+import GithubProvider from 'next-auth/providers/github'
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -22,19 +24,25 @@ export const authOptions: NextAuthOptions = {
           throw new Error('아이디 또는 비밀번호가 일치하지 않습니다')
         }
 
-        // Check password
         const isPasswordValid = await bcrypt.compare(password, user.password)
         if (!isPasswordValid) {
           throw new Error('아이디 또는 비밀번호가 일치하지 않습니다')
         }
 
-        // Return user object
         return {
           id: user._id.toString(),
           name: user.name,
           email: user.email,
         }
       },
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID || '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+    }),
+    GithubProvider({
+      clientId: process.env.GITHUB_ID || '',
+      clientSecret: process.env.GITHUB_SECRET || '',
     }),
   ],
   callbacks: {
@@ -54,6 +62,10 @@ export const authOptions: NextAuthOptions = {
       }
       return token
     },
+  },
+  session: {
+    strategy: 'jwt',
+    maxAge: 10 * 24 * 60 * 60,
   },
   secret: process.env.NEXTAUTH_SECRET,
 }
