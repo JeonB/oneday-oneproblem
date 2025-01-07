@@ -5,6 +5,14 @@ const openai = new OpenAI({
   dangerouslyAllowBrowser: true,
 })
 
+/**
+ * 주어진 주제와 난이도에 따라 알고리즘 문제를 생성하는 함수
+ *
+ * @param {string} topic - 문제의 주제."random"인 경우 임의의 주제를 선택.
+ * @param {string} difficulty - 문제의 난이도.
+ * @returns {Promise<string>} 생성된 문제를 HTML 형식으로 반환.
+ * @throws {Error} 문제가 생성되지 않았거나 응답에 선택지가 없는 경우 오류 반환.
+ */
 export async function generateProblem(topic: string, difficulty: string) {
   const prompt = `
 다음 주제에 관한 알고리즘 문제를 한국어로 작성해: ${topic}. 난이도는 ${difficulty}로 설정해.

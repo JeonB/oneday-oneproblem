@@ -76,7 +76,7 @@ export const CardsCreateAccount: React.FC<SignUpFormProps> = ({
             <Label htmlFor="name">닉네임</Label>
             <Input
               id="name"
-              placeholder="홍길동"
+              placeholder="김앤장"
               onChange={e => debouncedSetName(e.target.value)}
             />
           </div>
@@ -85,7 +85,7 @@ export const CardsCreateAccount: React.FC<SignUpFormProps> = ({
             <Input
               id="email"
               type="email"
-              placeholder="m@example.com"
+              placeholder="test@gmail.com"
               onChange={e => debouncedSetEmail(e.target.value)}
             />
           </div>

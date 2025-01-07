@@ -23,7 +23,7 @@ const SignUp: React.FC = () => {
       })
 
       if (!response.ok) {
-        throw new Error('Sign up failed')
+        throw new Error('회원가입 실패')
       }
 
       const data = await response.json()
@@ -39,12 +39,12 @@ const SignUp: React.FC = () => {
       })
 
       if (result?.error) {
-        throw new Error('Login failed')
+        throw new Error('로그인 실패')
       }
 
       router.push('/')
     } catch (err) {
-      setError('Sign up failed. Please try again.')
+      setError('회원 가입에 실패하였습니다. 다시 시도해주세요.')
     }
   }
 

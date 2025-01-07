@@ -51,7 +51,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ error, onSubmit }) => {
                 id="email"
                 type="email"
                 onChange={e => debouncedSetEmail(e.target.value)}
-                placeholder="m@example.com"
+                placeholder="test@gmail.com"
                 required
               />
             </div>
