@@ -70,3 +70,21 @@ export async function POST(req: NextRequest) {
     )
   }
 }
+
+//topic, difficulty, content, userSolution 를 반환하는 API
+export async function GET(req: NextRequest) {
+  try {
+    await connectDB()
+    const { userId } = await req.json()
+
+    const problems = await Problem.find({ userId })
+
+    return NextResponse.json(problems)
+  } catch (error) {
+    console.error(error)
+    return NextResponse.json(
+      { message: '서버 오류가 발생했습니다. 다시 시도해주세요.' },
+      { status: 500 },
+    )
+  }
+}

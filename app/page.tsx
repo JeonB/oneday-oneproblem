@@ -8,11 +8,12 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Algorithm } from '@/app/lib/models/Algorithms'
 import DifficultyModal from '@/components/ui/problem/DifficultyModal'
-import { useAlgorithmStore } from '@/components/context/Store'
+import { useAlgorithmStore, useProblemStore } from '@/components/context/Store'
 
 const MainPage: React.FC = () => {
   const router = useRouter()
   const { algorithms, isLoading, fetchAlgorithms } = useAlgorithmStore()
+  const { setTopic } = useProblemStore()
   const [selectedAlgorithm, setSelectedAlgorithm] = useState<Algorithm | null>(
     null,
   )
@@ -31,6 +32,7 @@ const MainPage: React.FC = () => {
   // 난이도 선택 후 이동
   const handleSelectDifficulty = (difficulty: string) => {
     setModalOpen(false)
+    setTopic(selectedAlgorithm?.name || '')
     router.push(`/problem/${selectedAlgorithm?.topic}?difficulty=${difficulty}`)
   }
 

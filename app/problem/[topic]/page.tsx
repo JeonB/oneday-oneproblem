@@ -28,7 +28,7 @@ const ProblemPage = () => {
   const { topic } = useParams()
   const searchParams = useSearchParams()
   const difficulty = searchParams.get('difficulty') || 'normal'
-  const { content, setContent, setInputOutput, setDifficulty, setTopic } =
+  const { content, setContent, setInputOutput, setDifficulty } =
     useProblemStore()
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
@@ -74,7 +74,6 @@ const ProblemPage = () => {
           setLoading(false)
         }
       }
-      setTopic(topic as string)
       setDifficulty(difficulty)
       fetchProblem()
     }

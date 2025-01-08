@@ -18,12 +18,12 @@ export const ResultDisplay = ({
   formatResult,
 }: ResultDisplayProps) => {
   return (
-    <div className="m-4 grid h-96 gap-4 overflow-y-auto md:h-[32rem]">
+    <div className="g-4 m-4 grid h-96 overflow-y-auto md:h-[15rem]">
       {results.map((result, index) => (
         <div
           key={index}
           className={clsx(
-            'relative ml-6 rounded-lg border p-4 shadow-md transition-transform duration-200 md:w-3/5',
+            'relative m-4 rounded-lg border p-4 shadow-md transition-transform duration-200 md:h-36 md:w-3/5',
             result.passed
               ? 'border-green-300 bg-green-50 text-green-700 hover:scale-105'
               : 'border-red-300 bg-red-50 text-red-700 hover:scale-105',
