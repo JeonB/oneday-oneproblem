@@ -27,6 +27,7 @@ export type AiGeneratedContent = {
   input: string[] | string
   output: string | string[] | undefined
 }
+
 interface ProblemState {
   topic: string
   difficulty: string
@@ -48,19 +49,25 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-store',
-      partialize: state => ({ loginState: state.loginState }),
     },
   ),
 )
 
-export const useSignInAndUpStore = create<SignUpState>(set => ({
-  name: '',
-  email: '',
-  password: '',
-  setName: name => set({ name }),
-  setEmail: email => set({ email }),
-  setPassword: password => set({ password }),
-}))
+export const useSignInAndUpStore = create<SignUpState>()(
+  persist(
+    set => ({
+      name: '',
+      email: '',
+      password: '',
+      setName: name => set({ name }),
+      setEmail: email => set({ email }),
+      setPassword: password => set({ password }),
+    }),
+    {
+      name: 'signup-store',
+    },
+  ),
+)
 
 export const useAlgorithmStore = create<AlgorithmState>()(
   persist(
@@ -88,20 +95,30 @@ export const useAlgorithmStore = create<AlgorithmState>()(
     }),
     {
       name: 'algorithm-store',
-      partialize: state => ({ algorithms: state.algorithms }),
     },
   ),
 )
 
-export const useProblemStore = create<ProblemState>(set => ({
-  topic: '',
-  difficulty: '',
-  inputOutput: [],
-  userSolution: '',
-  content: '',
-  setTopic: topic => set({ topic }),
-  setDifficulty: difficulty => set({ difficulty }),
-  setInputOutput: inputOutput => set({ inputOutput }),
-  setUserSolution: userSolution => set({ userSolution }),
-  setContent: content => set({ content }),
-}))
+export const useProblemStore = create(
+  persist(
+    set => ({
+      topic: '',
+      difficulty: '',
+      inputOutput: [],
+      userSolution: '',
+      content: '',
+      setTopic: topic => set({ topic }),
+      setDifficulty: difficulty => set({ difficulty }),
+      setInputOutput: inputOutput => set({ inputOutput }),
+      setUserSolution: userSolution => set({ userSolution }),
+      setContent: content => set({ content }),
+    }),
+    {
+      name: 'problem-store',
+      partialize: (state: ProblemState) => ({
+        content: state.content,
+        userSolution: state.userSolution,
+      }),
+    },
+  ),
+)

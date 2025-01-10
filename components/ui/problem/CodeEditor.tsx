@@ -4,11 +4,9 @@ import { javascript } from '@codemirror/lang-javascript'
 import { java } from '@codemirror/lang-java'
 import { cpp } from '@codemirror/lang-cpp'
 import { python } from '@codemirror/lang-python'
-import { useStore } from '@/components/context/StoreContext'
 import { useProblemStore } from '@/components/context/Store'
 
 export default function CodeEditor() {
-  const { code, setCode } = useStore()
   const { userSolution, setUserSolution } = useProblemStore()
   const [language, setLanguage] = useState('javascript')
 

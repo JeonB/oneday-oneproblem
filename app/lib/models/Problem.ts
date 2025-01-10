@@ -1,12 +1,12 @@
 import mongoose, { Schema } from 'mongoose'
 
 export interface ProblemProps {
-  _id: mongoose.Types.ObjectId
-  userId: mongoose.Types.ObjectId
+  _id?: mongoose.Types.ObjectId
+  userId?: mongoose.Types.ObjectId
   topic: string
   difficulty: string
   content: string
-  userSolution?: string
+  userSolution: string
   createdAt: Date
 }
 

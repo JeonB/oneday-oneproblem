@@ -8,9 +8,21 @@ import { useProblemStore, AiGeneratedContent } from '@/components/context/Store'
 import LoadingPage from './loading-out'
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 
-const parseInputOutputExamples = (inputOutputExample: string) => {
+const parseInputOutputExamples = (generatedProblem: string) => {
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(generatedProblem, 'text/html')
+
+  const inputOutputExampleHeader = Array.from(doc.querySelectorAll('h3')).find(
+    element => element.textContent?.includes('입출력 예시'),
+  )
+
+  const inputOutputExampleElement = inputOutputExampleHeader?.nextElementSibling
+  const inputOutputExample = inputOutputExampleElement
+    ? inputOutputExampleElement.textContent?.trim()
+    : ''
+
   const examples: AiGeneratedContent[] = []
-  const blocks = inputOutputExample.split(/\n\s*\n/).filter(Boolean)
+  const blocks = (inputOutputExample || '').split(/\n\s*\n/).filter(Boolean)
   blocks.forEach(block => {
     const lines = block
       .trim()
@@ -34,51 +46,28 @@ const ProblemPage = () => {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (topic) {
-      const fetchProblem = async () => {
-        setLoading(true)
-        setError(null)
-        try {
-          const generatedProblem = await generateProblem(
-            topic as string,
-            difficulty,
-          )
-          if (typeof generatedProblem === 'string') {
-            setContent(generatedProblem)
-
-            const parser = new DOMParser()
-            const doc = parser.parseFromString(generatedProblem, 'text/html')
-
-            const inputOutputExampleHeader = Array.from(
-              doc.querySelectorAll('h3'),
-            ).find(element => element.textContent?.includes('입출력 예시'))
-
-            const inputOutputExampleElement =
-              inputOutputExampleHeader?.nextElementSibling
-            const inputOutputExample = inputOutputExampleElement
-              ? inputOutputExampleElement.textContent?.trim()
-              : ''
-            const inputOutput = parseInputOutputExamples(
-              inputOutputExample || '',
-            )
-
-            // AI가 생성한 테스트 케이스를 저장
-            setInputOutput(inputOutput)
-          } else {
-            throw new Error('Generated problem is not a string')
-          }
-        } catch (err) {
-          setError('문제 생성 중 오류가 발생했습니다. 다시 시도해주세요.')
-          console.error('Error fetching problem:', err)
-        } finally {
-          setLoading(false)
+    const initializeContent = async () => {
+      setLoading(true)
+      try {
+        const generatedProblem = !content
+          ? await generateProblem(topic as string, difficulty)
+          : content
+        if (typeof generatedProblem === 'string') {
+          setContent(generatedProblem)
+          const inputOutput = parseInputOutputExamples(generatedProblem)
+          setInputOutput(inputOutput)
+          setDifficulty(difficulty)
         }
+      } catch (err) {
+        setError('문제 생성 중 오류가 발생했습니다. 다시 시도해주세요.')
+        console.error('Error fetching problem:', err)
+      } finally {
+        setLoading(false)
       }
-      setDifficulty(difficulty)
-      fetchProblem()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+
+    initializeContent()
+  }, [content])
 
   return (
     <>

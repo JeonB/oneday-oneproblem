@@ -10,15 +10,6 @@ export async function POST(req: NextRequest) {
     const { userId, topic, difficulty, content, userSolution, email } =
       await req.json()
 
-    const newProblem = new Problem({
-      userId,
-      topic,
-      difficulty,
-      content,
-      userSolution,
-    })
-    await newProblem.save()
-
     // 요청 데이터 가져오기
     const userStats = (await User.findOne({ email })) as UserProps | null
 
@@ -33,6 +24,23 @@ export async function POST(req: NextRequest) {
 
     if (userStats.lastSolvedDate === today) {
       // 오늘 이미 문제를 푼 경우
+      return NextResponse.json({
+        streak: userStats.streak,
+        totalProblemsSolved: userStats.totalProblemsSolved,
+      })
+    }
+
+    // 기존에 풀었던 문제인지 확인
+    const existingProblem = await Problem.findOne({ userId, content })
+    if (existingProblem) {
+      // 기존에 풀었던 문제인 푼 경우
+      await existingProblem.updateOne({
+        $set: {
+          userSolution: userSolution,
+        },
+        $inc: { totalProblemsSolved: 1 },
+      })
+
       return NextResponse.json({
         streak: userStats.streak,
         totalProblemsSolved: userStats.totalProblemsSolved,
@@ -57,6 +65,15 @@ export async function POST(req: NextRequest) {
         $inc: { totalProblemsSolved: 1 },
       },
     )
+
+    const newProblem = new Problem({
+      userId,
+      topic,
+      difficulty,
+      content,
+      userSolution,
+    })
+    await newProblem.save()
 
     return NextResponse.json({
       streak: newStreak,
