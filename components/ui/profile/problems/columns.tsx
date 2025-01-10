@@ -85,7 +85,7 @@ export const columns: ColumnDef<ProblemProps>[] = [
             'md:text-md text-center text-sm',
             row.original.difficulty === 'easy'
               ? 'text-green-500'
-              : row.original.topic === 'normal'
+              : row.original.difficulty === 'normal'
                 ? 'text-yellow-500'
                 : 'text-red-500',
           )}>

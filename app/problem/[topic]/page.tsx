@@ -40,8 +40,13 @@ const ProblemPage = () => {
   const { topic } = useParams()
   const searchParams = useSearchParams()
   const difficulty = searchParams.get('difficulty') || 'normal'
-  const { content, setContent, setInputOutput, setDifficulty } =
-    useProblemStore()
+  const {
+    content,
+    setContent,
+    setInputOutput,
+    setDifficulty,
+    setUserSolution,
+  } = useProblemStore()
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -49,14 +54,26 @@ const ProblemPage = () => {
     const initializeContent = async () => {
       setLoading(true)
       try {
-        const generatedProblem = !content
-          ? await generateProblem(topic as string, difficulty)
-          : content
+        let generatedProblem: string
+
+        if (!content) {
+          const result = await generateProblem(topic as string, difficulty)
+          if (result instanceof Error) {
+            throw result
+          }
+          generatedProblem = result
+          setUserSolution('')
+        } else {
+          generatedProblem = content
+        }
+
         if (typeof generatedProblem === 'string') {
           setContent(generatedProblem)
           const inputOutput = parseInputOutputExamples(generatedProblem)
           setInputOutput(inputOutput)
           setDifficulty(difficulty)
+        } else {
+          throw new Error('Generated problem is not a string')
         }
       } catch (err) {
         setError('문제 생성 중 오류가 발생했습니다. 다시 시도해주세요.')

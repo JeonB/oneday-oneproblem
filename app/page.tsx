@@ -13,7 +13,7 @@ import { useAlgorithmStore, useProblemStore } from '@/components/context/Store'
 const MainPage: React.FC = () => {
   const router = useRouter()
   const { algorithms, isLoading, fetchAlgorithms } = useAlgorithmStore()
-  const { setTopic } = useProblemStore()
+  const { setTopic, setUserSolution, setContent } = useProblemStore()
   const [selectedAlgorithm, setSelectedAlgorithm] = useState<Algorithm | null>(
     null,
   )
@@ -27,6 +27,8 @@ const MainPage: React.FC = () => {
     if (algorithms.length === 0) {
       fetchAlgorithms()
     }
+    setUserSolution('')
+    setContent('')
   }, [algorithms, fetchAlgorithms])
 
   // 난이도 선택 후 이동
