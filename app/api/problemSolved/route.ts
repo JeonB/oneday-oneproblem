@@ -1,72 +1,64 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { connectDB } from '@/app/lib/connecter'
 import User, { UserProps } from '@/app/lib/models/User'
-import dayjs from 'dayjs'
 import Problem from '@/app/lib/models/Problem'
+import dayjs from 'dayjs'
 
-export async function POST(req: NextRequest) {
-  try {
-    await connectDB()
-    const { userId, topic, difficulty, content, userSolution, email } =
-      await req.json()
+// 유저 정보 업데이트 함수
+async function updateUserStats(
+  email: string,
+  today: string,
+): Promise<{ streak: number; totalProblemsSolved: number }> {
+  const userStats = (await User.findOne({ email })) as UserProps | null
 
-    // 요청 데이터 가져오기
-    const userStats = (await User.findOne({ email })) as UserProps | null
+  if (!userStats) {
+    throw new Error('사용자를 찾을 수 없습니다.')
+  }
 
-    if (!userStats) {
-      return NextResponse.json(
-        { message: '사용자를 찾을 수 없습니다.' },
-        { status: 404 },
-      )
-    }
+  const isYesterday = dayjs(userStats.lastSolvedDate).isSame(
+    dayjs().subtract(1, 'day'),
+    'day',
+  )
 
-    const today = dayjs().startOf('day').toISOString()
+  const newStreak = isYesterday ? userStats.streak + 1 : 1
 
-    if (userStats.lastSolvedDate === today) {
-      // 오늘 이미 문제를 푼 경우
-      return NextResponse.json({
-        streak: userStats.streak,
-        totalProblemsSolved: userStats.totalProblemsSolved,
-      })
-    }
-
-    // 기존에 풀었던 문제인지 확인
-    const existingProblem = await Problem.findOne({ userId, content })
-    if (existingProblem) {
-      // 기존에 풀었던 문제인 푼 경우
-      await existingProblem.updateOne({
-        $set: {
-          userSolution: userSolution,
-        },
-        $inc: { totalProblemsSolved: 1 },
-      })
-
-      return NextResponse.json({
-        streak: userStats.streak,
-        totalProblemsSolved: userStats.totalProblemsSolved,
-      })
-    }
-
-    // 자정을 넘긴 경우
-    const isYesterday = dayjs(userStats.lastSolvedDate).isSame(
-      dayjs().subtract(1, 'day'),
-      'day',
-    )
-
-    const newStreak = isYesterday ? userStats.streak + 1 : 1
-
-    await User.updateOne(
-      { email },
-      {
-        $set: {
-          lastSolvedDate: today,
-          streak: newStreak,
-        },
-        $inc: { totalProblemsSolved: 1 },
+  await User.updateOne(
+    { email },
+    {
+      $set: {
+        lastSolvedDate: today,
+        streak: newStreak,
       },
-    )
+      $inc: { totalProblemsSolved: 1 },
+    },
+  )
 
+  return {
+    streak: newStreak,
+    totalProblemsSolved: userStats.totalProblemsSolved + 1,
+  }
+}
+
+// 문제 풀이 상태 업데이트 함수
+async function handleProblemUpdate(
+  title: string,
+  userId: string,
+  content: string,
+  userSolution: string,
+  topic: string,
+  difficulty: string,
+): Promise<void> {
+  const existingProblem = await Problem.findOne({ userId, content })
+
+  if (existingProblem) {
+    // 기존 문제 업데이트
+    await existingProblem.updateOne({
+      $set: { userSolution },
+    })
+  } else {
+    // 새 문제 생성
     const newProblem = new Problem({
+      title,
       userId,
       topic,
       difficulty,
@@ -74,11 +66,40 @@ export async function POST(req: NextRequest) {
       userSolution,
     })
     await newProblem.save()
+  }
+}
 
-    return NextResponse.json({
-      streak: newStreak,
-      totalProblemsSolved: userStats.totalProblemsSolved + 1,
-    })
+// POST: 문제 풀이 처리 및 유저 업데이트
+export async function POST(req: NextRequest) {
+  try {
+    await connectDB()
+    const { title, userId, topic, difficulty, content, userSolution, email } =
+      await req.json()
+
+    const today = dayjs().startOf('day').toISOString()
+
+    const userStats = await User.findOne({ email })
+    if (!userStats) {
+      return NextResponse.json(
+        { message: '사용자를 찾을 수 없습니다.' },
+        { status: 404 },
+      )
+    }
+
+    // 문제 풀이 업데이트
+    await handleProblemUpdate(
+      title,
+      userId,
+      content,
+      userSolution,
+      topic,
+      difficulty,
+    )
+
+    // 유저 정보 업데이트
+    const updatedStats = await updateUserStats(email, today)
+
+    return NextResponse.json(updatedStats)
   } catch (error) {
     console.error(error)
     return NextResponse.json(
@@ -88,7 +109,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-//topic, difficulty, content, userSolution 를 반환하는 API
+// GET: 유저의 문제 목록 가져오기
 export async function GET(req: NextRequest) {
   try {
     await connectDB()

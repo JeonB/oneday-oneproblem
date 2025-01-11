@@ -62,6 +62,31 @@ export const columns: ColumnDef<ProblemProps>[] = [
     },
   },
   {
+    accessorKey: 'title',
+    header: ({ column }) => {
+      return (
+        <div className="flex justify-center">
+          <Button
+            className="text-md text-center md:text-lg"
+            variant="ghost"
+            onClick={() =>
+              column.toggleSorting(column.getIsSorted() === 'asc')
+            }>
+            제목
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        </div>
+      )
+    },
+    cell: ({ row }) => {
+      return (
+        <div className="md:text-md text-center text-sm">
+          {row.original.title}
+        </div>
+      )
+    },
+  },
+  {
     accessorKey: 'difficulty',
     header: ({ column }) => {
       return (

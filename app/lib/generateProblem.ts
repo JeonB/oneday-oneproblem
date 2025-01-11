@@ -39,6 +39,7 @@ ${topic}이 "random"인 경우, 임의의 주제를 선택해.
           content: `
           너는 알고리즘 문제를 작성하는 배테랑 소프트웨어 엔지니어야.
           응답은 반드시 HTML 형식으로 작성해야 하며, 다음 구조를 따라야 해:
+          <h1>**문제 제목**</h1>
           <h2>문제 설명</h2>
           <p>[문제 설명]</p>
           <h3>제한 사항</h3>
@@ -75,6 +76,11 @@ ${topic}이 "random"인 경우, 임의의 주제를 선택해.
     if (response.choices && response.choices.length > 0) {
       const rawText = response.choices[0].message.content
       const cleanHTMLResponse = (response: string) => {
+        // <h1> 태그의 제목의 문자의 크기를 tailwindcss로 lg로 하고 볼드체 사용하는것으로 변환
+        response = response.replace(
+          /<h1>(.*?)<\/h1>/,
+          '<h1 class="text-xl font-bold">$1</h1>',
+        )
         response = response.replace(/```html|```/g, '')
         response = response.replaceAll(
           /(문제 설명|제한 사항|입출력 예시|입출력 예 설명|입출력 예:\s.*?)/g,

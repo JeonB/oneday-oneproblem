@@ -15,7 +15,8 @@ const parseInputOutputExamples = (generatedProblem: string) => {
   const inputOutputExampleHeader = Array.from(doc.querySelectorAll('h3')).find(
     element => element.textContent?.includes('입출력 예시'),
   )
-
+  const titleElement = doc.querySelector('h1')
+  const title = titleElement?.textContent?.trim() || 'Untitled'
   const inputOutputExampleElement = inputOutputExampleHeader?.nextElementSibling
   const inputOutputExample = inputOutputExampleElement
     ? inputOutputExampleElement.textContent?.trim()
@@ -33,7 +34,7 @@ const parseInputOutputExamples = (generatedProblem: string) => {
     const input = lines
     examples.push({ input, output })
   })
-  return examples
+  return { title, examples }
 }
 
 const ProblemPage = () => {
@@ -41,6 +42,7 @@ const ProblemPage = () => {
   const searchParams = useSearchParams()
   const difficulty = searchParams.get('difficulty') || 'normal'
   const {
+    setTitle,
     content,
     setContent,
     setInputOutput,
@@ -70,7 +72,8 @@ const ProblemPage = () => {
         if (typeof generatedProblem === 'string') {
           setContent(generatedProblem)
           const inputOutput = parseInputOutputExamples(generatedProblem)
-          setInputOutput(inputOutput)
+          setInputOutput(inputOutput.examples)
+          setTitle(inputOutput.title)
           setDifficulty(difficulty)
         } else {
           throw new Error('Generated problem is not a string')
@@ -84,7 +87,16 @@ const ProblemPage = () => {
     }
 
     initializeContent()
-  }, [content])
+  }, [
+    content,
+    difficulty,
+    setContent,
+    setDifficulty,
+    setInputOutput,
+    setTitle,
+    setUserSolution,
+    topic,
+  ])
 
   return (
     <>

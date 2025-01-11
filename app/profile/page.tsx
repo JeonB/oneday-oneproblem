@@ -29,6 +29,7 @@ export default async function Page() {
     const transformedProblems = problems.map(problem => ({
       userSolution: problem.userSolution,
       content: problem.content,
+      title: problem.title,
       topic: problem.topic,
       difficulty: problem.difficulty,
       createdAt: problem.createdAt,

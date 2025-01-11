@@ -3,6 +3,7 @@ import mongoose, { Schema } from 'mongoose'
 export interface ProblemProps {
   _id?: mongoose.Types.ObjectId
   userId?: mongoose.Types.ObjectId
+  title: string
   topic: string
   difficulty: string
   content: string
@@ -12,6 +13,7 @@ export interface ProblemProps {
 
 const ProblemSchema: Schema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  title: { type: String, required: true },
   topic: { type: String, required: true },
   difficulty: { type: String, required: true },
   content: { type: String, required: true },

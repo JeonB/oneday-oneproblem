@@ -29,11 +29,13 @@ export type AiGeneratedContent = {
 }
 
 interface ProblemState {
+  title: string
   topic: string
   difficulty: string
   inputOutput: AiGeneratedContent[]
   userSolution: string
   content: string
+  setTitle: (title: string) => void
   setTopic: (topic: string) => void
   setDifficulty: (difficulty: string) => void
   setInputOutput: (inputOutput: AiGeneratedContent[]) => void
@@ -102,11 +104,13 @@ export const useAlgorithmStore = create<AlgorithmState>()(
 export const useProblemStore = create(
   persist(
     set => ({
+      title: '',
       topic: '',
       difficulty: '',
       inputOutput: [],
       userSolution: '',
       content: '',
+      setTitle: title => set({ title }),
       setTopic: topic => set({ topic }),
       setDifficulty: difficulty => set({ difficulty }),
       setInputOutput: inputOutput => set({ inputOutput }),

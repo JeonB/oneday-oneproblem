@@ -54,7 +54,7 @@ export default function CodeExecution() {
   const [feedback, setFeedback] = useState<FeedbackState | null>(null)
   const [isLoadingFeedback, setLoadingFeedback] = useState(false)
   const { data: session } = useSession()
-  const { topic, difficulty, content, userSolution, inputOutput } =
+  const { title, topic, difficulty, content, userSolution, inputOutput } =
     useProblemStore()
 
   const email = session?.user?.email
@@ -108,6 +108,7 @@ export default function CodeExecution() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          title,
           email,
           userId,
           topic,
@@ -126,7 +127,7 @@ export default function CodeExecution() {
       console.error(error)
       alert('문제를 푸는 데 실패했습니다.')
     }
-  }, [email, userId, topic, difficulty, content, userSolution])
+  }, [title, email, userId, topic, difficulty, content, userSolution])
 
   useEffect(() => {
     if (
