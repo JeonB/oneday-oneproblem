@@ -1,36 +1,82 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 1일 1문제 프로젝트
 
-## Getting Started
+**기간:** 2025.01 - 진행 중
+**목표:**
+매일 하나의 알고리즘 문제를 해결하며, 꾸준한 학습과 문제 해결 능력 향상을 추구하는 프로젝트입니다.
+코드 작성뿐만 아니라 효율성과 가독성을 개선하며, AI 피드백을 통해 코드 품질을 지속적으로 업그레이드합니다.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 📝 프로젝트 개요
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1일 1문제 프로젝트는 개발자로서의 성장과 학습의 꾸준함을 목표로 설계되었습니다.
+다양한 알고리즘 문제를 해결하면서 자료구조, 시간 복잡도, 효율적인 코딩 방법에 대해 깊이 탐구합니다.
+문제 풀이 과정에서 생성된 코드는 AI 피드백을 통해 분석하고, 개선된 코드를 도출합니다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 💡 주요 기능
 
-## Learn More
+### 1. 알고리즘 문제 풀이
 
-To learn more about Next.js, take a look at the following resources:
+- **문제 유형:** 정렬, 탐색, 그래프, 동적 프로그래밍, 트리 등
+- **난이도:** 초급부터 고급까지 다양한 난이도의 문제 해결
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 2. 코드 실행 및 결과 확인
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- 입력값과 예상 출력값을 기반으로 코드의 실행 결과를 확인
+- 여러 테스트 케이스에 대해 결과와 에러를 직관적으로 표시
 
-## Deploy on Vercel
+### 3. AI 피드백 기능
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- AI를 통해 코드의 효율성 및 가독성을 평가
+- 시간 복잡도 분석 및 개선된 코드 추천
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 4. 결과 시각화
+
+- 테스트 케이스별 성공/실패 여부를 UI로 시각화
+- 피드백 결과를 UI에서 확인 가능
+
+---
+
+## 🛠️ 기술 스택
+
+### Frontend
+
+- **프레임워크:** Next.js 14
+- **언어:** TypeScript
+- **스타일링:** Tailwind CSS, clsx
+
+### Backend
+
+- **API:** Node.js 기반 API
+- **AI 피드백:** OpenAI API
+
+### Tools
+
+- **상태 관리:** Context API (useProblemStore)
+- **테스트:** Jest
+
+---
+
+## 🖥️ 컴포넌트 구조
+
+### CodeExecution
+
+- 사용자가 작성한 코드를 실행하고, 결과와 AI 피드백을 보여주는 메인 컴포넌트
+
+### ResultDisplay
+
+- 실행 결과와 테스트 케이스의 성공 여부를 시각화
+
+### Feedback
+
+- AI가 제공한 코드 피드백과 개선된 코드를 렌더링
+
+---
+
+## 📈 학습 및 성장
+
+- **자료구조와 알고리즘:** 매일 새로운 문제를 해결하며, 다양한 알고리즘과 자료구조에 대한 이해를 강화
+- **코드 품질 개선:** AI 피드백을 활용해 코드의 효율성과 가독성을 지속적으로 개선
+- **시간 관리:** 매일 문제를 해결하며 꾸준히 목표를 달성하는 습관을 형성
