@@ -6,6 +6,12 @@ import { authOptions } from '@/app/lib/authoptions'
 import Problem from '@/app/lib/models/Problem'
 import { DataTable } from '@/components/ui/profile/problems/data-table'
 import { columns } from '@/components/ui/profile/problems/columns'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: '프로필 관리',
+  description: '프로필 관리 및 문제 상세페이지',
+}
 
 export default async function Page() {
   await connectDB()
