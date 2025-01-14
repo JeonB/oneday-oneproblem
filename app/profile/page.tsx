@@ -7,6 +7,7 @@ import Problem from '@/app/lib/models/Problem'
 import { DataTable } from '@/components/ui/profile/problems/data-table'
 import { columns } from '@/components/ui/profile/problems/columns'
 import type { Metadata } from 'next'
+import dayjs from 'dayjs'
 
 export const metadata: Metadata = {
   title: '프로필 관리',
@@ -30,6 +31,22 @@ export default async function Page() {
   try {
     const email = session.user?.email
     const user = await User.findOne({ email })
+
+    const isYesterday = dayjs(user.lastSolvedDate).isSame(
+      dayjs().subtract(1, 'day'),
+      'day',
+    )
+
+    if (!isYesterday) {
+      await User.updateOne(
+        { email },
+        {
+          $set: {
+            streak: 0,
+          },
+        },
+      )
+    }
     const userId = user?._id
     const problems = await Problem.find({ userId }).lean()
     const transformedProblems = problems.map(problem => ({

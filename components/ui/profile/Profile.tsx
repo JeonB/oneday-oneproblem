@@ -30,9 +30,14 @@ const profileFormSchema = z.object({
     .max(30, {
       message: '사용자 이름은 30글자를 넘을 수 없습니다.',
     }),
-  password: z.string().min(4, {
-    message: '비밀번호는 최소 4글자 이상이어야 합니다.',
-  }),
+  password: z
+    .string()
+    .min(4, {
+      message: '비밀번호는 최소 4글자 이상이어야 합니다.',
+    })
+    .max(30, {
+      message: '비밀번호는 30글자를 넘을 수 없습니다.',
+    }),
   totalProblemsSolved: z.number(),
   streak: z.number(),
 })
@@ -50,7 +55,7 @@ export function ProfileForm({ defaultValues }: ProfileFormProps) {
     mode: 'onChange',
   })
   const { data: session } = useSession()
-  const { loginState, setLoginState } = useAuthStore()
+  const { setLoginState } = useAuthStore()
   const router = useRouter()
   async function onSubmit(data: ProfileFormValues) {
     try {
@@ -146,10 +151,10 @@ export function ProfileForm({ defaultValues }: ProfileFormProps) {
                   <Input
                     placeholder="사용자 이름을 입력하세요"
                     {...field}
-                    className="text-black"
+                    className="border-sky-600 text-black"
                   />
                 </FormControl>
-                <FormMessage className="text-black" />
+                <FormMessage className="text-red-600" />
               </FormItem>
             )}
           />
@@ -169,7 +174,7 @@ export function ProfileForm({ defaultValues }: ProfileFormProps) {
                     className="text-black"
                   />
                 </FormControl>
-                <FormMessage className="text-black" />
+                <FormMessage className="text-red-600" />
               </FormItem>
             )}
           />
