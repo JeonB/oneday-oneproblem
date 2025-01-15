@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import CodeMirror from '@uiw/react-codemirror'
 import { javascript } from '@codemirror/lang-javascript'
 import { java } from '@codemirror/lang-java'
@@ -7,7 +7,8 @@ import { python } from '@codemirror/lang-python'
 import { useProblemStore } from '@/components/context/Store'
 
 export default function CodeEditor() {
-  const { userSolution, setUserSolution } = useProblemStore()
+  const { userSolution, setUserSolution, content, inputOutput } =
+    useProblemStore()
   const [language, setLanguage] = useState('javascript')
 
   const onChange = (value: string) => {
@@ -35,6 +36,14 @@ export default function CodeEditor() {
         return javascript({ jsx: true })
     }
   }
+
+  useEffect(() => {
+    if ((userSolution && userSolution.length > 0) || !inputOutput) return
+    const template = `function solution(${inputOutput[0].input}){
+
+}`
+    setUserSolution(template)
+  }, [inputOutput, setUserSolution, userSolution])
 
   return (
     <div>
