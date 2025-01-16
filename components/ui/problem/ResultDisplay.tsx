@@ -18,7 +18,7 @@ export const ResultDisplay = ({
   formatResult,
 }: ResultDisplayProps) => {
   return (
-    <div className="g-4 m-4 grid h-96 overflow-y-auto md:h-[15rem]">
+    <div className="g-4 m-4 grid">
       {results.map((result, index) => (
         <div
           key={index}

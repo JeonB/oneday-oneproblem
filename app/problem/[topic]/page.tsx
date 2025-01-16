@@ -114,14 +114,20 @@ const ProblemPage = () => {
           <PanelResizeHandle className="h-screen w-1 bg-stone-400" />
           <Panel defaultSizePercentage={60} minSizePercentage={30}>
             <PanelGroup direction="vertical">
-              <Panel defaultSizePercentage={60} minSizePercentage={30}>
-                <CodeEditor />
+              <Panel defaultSizePercentage={60} minSizePercentage={10}>
+                <div className="flex h-full overflow-hidden">
+                  <div className="flex-1 overflow-auto">
+                    <CodeEditor />
+                  </div>
+                </div>
               </Panel>
               <PanelResizeHandle className="h-1 w-full bg-stone-400" />
-              <Panel defaultSizePercentage={40} minSizePercentage={30}>
-                <div className="p-4">
-                  <h3 className="mb-2">실행 결과</h3>
-                  <CodeExecution />
+              <Panel defaultSizePercentage={40} minSizePercentage={10}>
+                <div className="flex h-full overflow-hidden">
+                  <div className="flex-1 overflow-auto p-4">
+                    <h3 className="mb-2">실행 결과</h3>
+                    <CodeExecution />
+                  </div>
                 </div>
               </Panel>
             </PanelGroup>

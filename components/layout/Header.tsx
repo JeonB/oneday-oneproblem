@@ -22,12 +22,15 @@ export default function Header() {
 
   return (
     <nav className={classes.nav}>
-      <Link href="/">
-        <Image
-          src={logoImg}
-          alt="logo"
-          className="h-10 w-auto rounded-xl p-2 md:h-14 xl:h-16"
-        />
+      <Link href="/" className={classes.a}>
+        <div className="flex items-center gap-2">
+          <Image
+            src={logoImg}
+            alt="logo"
+            className="h-10 w-auto rounded-xl p-2 md:h-14 xl:h-16"
+          />
+          1일 1문제
+        </div>
       </Link>
 
       <ul className={classes.ul}>
@@ -35,7 +38,7 @@ export default function Header() {
           <>
             <li className={classes.li}>
               <Link className={classes.a} href="/profile">
-                {session?.user?.name}님 환영합니다.
+                {session?.user?.name}
               </Link>
             </li>
             <li className={classes.li}>

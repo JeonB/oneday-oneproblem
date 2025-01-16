@@ -5,10 +5,10 @@ import { java } from '@codemirror/lang-java'
 import { cpp } from '@codemirror/lang-cpp'
 import { python } from '@codemirror/lang-python'
 import { useProblemStore } from '@/components/context/Store'
+import { abcdef } from '@uiw/codemirror-themes-all'
 
 export default function CodeEditor() {
-  const { userSolution, setUserSolution, content, inputOutput } =
-    useProblemStore()
+  const { userSolution, setUserSolution, inputOutput } = useProblemStore()
   const [language, setLanguage] = useState('javascript')
 
   const onChange = (value: string) => {
@@ -57,8 +57,7 @@ export default function CodeEditor() {
       <CodeMirror
         value={userSolution}
         onChange={onChange}
-        height="70vh"
-        theme="dark"
+        theme={abcdef}
         extensions={[getLanguageExtension()]}
       />
     </div>
