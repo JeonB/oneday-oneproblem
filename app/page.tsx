@@ -29,7 +29,7 @@ const MainPage: React.FC = () => {
     }
     setUserSolution('')
     setContent('')
-  }, [algorithms, fetchAlgorithms])
+  }, [algorithms, fetchAlgorithms, setContent, setUserSolution])
 
   // 난이도 선택 후 이동
   const handleSelectDifficulty = (difficulty: string) => {

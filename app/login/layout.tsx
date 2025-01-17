@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   description: '로그인 해야 문제 볼 수 있음!',
 }
 
-export default async function Layout({
+export default async function LoginLayout({
   children,
 }: Readonly<{
   children: React.ReactNode

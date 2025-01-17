@@ -7,6 +7,9 @@ import CodeExecution from '@/components/ui/problem/CodeExecution'
 import { useProblemStore, AiGeneratedContent } from '@/components/context/Store'
 import LoadingPage from './loading-out'
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
+import Link from 'next/link'
+import logoImg from '@/public/images/logo.png'
+import Image from 'next/image'
 
 const parseInputOutputExamples = (generatedProblem: string) => {
   const parser = new DOMParser()
@@ -107,9 +110,22 @@ const ProblemPage = () => {
       ) : (
         <PanelGroup direction="horizontal">
           <Panel defaultSizePercentage={40} minSizePercentage={30}>
-            <div
-              className="whitespace-normal p-4 text-left"
-              dangerouslySetInnerHTML={{ __html: content }}></div>
+            <div className="flex h-screen flex-col">
+              <div className="flex-grow overflow-auto whitespace-normal p-4 text-left">
+                <Link href="/" className="py-4 text-xl font-bold">
+                  <div className="mb-2 flex items-center gap-2">
+                    <Image
+                      src={logoImg}
+                      alt="logo"
+                      className="h-8 w-auto rounded-xl p-2 md:h-14 xl:h-16"
+                    />
+                    1일 1문제
+                  </div>
+                </Link>
+                {/* 콘텐츠를 여기에 렌더링 */}
+                <div dangerouslySetInnerHTML={{ __html: content }}></div>
+              </div>
+            </div>
           </Panel>
           <PanelResizeHandle className="h-screen w-1 bg-stone-400" />
           <Panel defaultSizePercentage={60} minSizePercentage={30}>

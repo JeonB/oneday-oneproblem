@@ -27,7 +27,6 @@ export const metadata: Metadata = {
   },
   description: '하루에 한 문제씩 알고리즘 문제를 풀어보세요!',
 }
-
 export default async function RootLayout({
   children,
 }: Readonly<{

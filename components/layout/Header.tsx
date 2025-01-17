@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { Button } from '../ui/button'
 import classes from './header.module.css'
 import { signOut, useSession } from 'next-auth/react'
@@ -20,45 +20,51 @@ export default function Header() {
     router.push('/')
   }
 
+  const pathname = usePathname()
+  const isProblemPage = pathname.startsWith('/problem')
   return (
-    <nav className={classes.nav}>
-      <Link href="/" className={classes.a}>
-        <div className="flex items-center gap-2">
-          <Image
-            src={logoImg}
-            alt="logo"
-            className="h-10 w-auto rounded-xl p-2 md:h-14 xl:h-16"
-          />
-          1일 1문제
-        </div>
-      </Link>
+    <>
+      {!isProblemPage && (
+        <nav className={classes.nav}>
+          <Link href="/" className={classes.a}>
+            <div className="flex items-center gap-2">
+              <Image
+                src={logoImg}
+                alt="logo"
+                className="h-10 w-auto rounded-xl p-2 md:h-14 xl:h-16"
+              />
+              1일 1문제
+            </div>
+          </Link>
 
-      <ul className={classes.ul}>
-        {loginState ? (
-          <>
-            <li className={classes.li}>
-              <Link className={classes.a} href="/profile">
-                {session?.user?.name}
-              </Link>
-            </li>
-            <li className={classes.li}>
-              <Button variant="link" asChild onClick={onLogout}>
-                <Link className={classes.a} href="/">
-                  로그아웃
-                </Link>
-              </Button>
-            </li>
-          </>
-        ) : (
-          <li className={classes.li}>
-            <Button variant="link" asChild>
-              <Link className={classes.a} href="/login">
-                로그인/회원가입
-              </Link>
-            </Button>
-          </li>
-        )}
-      </ul>
-    </nav>
+          <ul className={classes.ul}>
+            {loginState ? (
+              <>
+                <li className={classes.li}>
+                  <Link className={classes.a} href="/profile">
+                    {session?.user?.name}
+                  </Link>
+                </li>
+                <li className={classes.li}>
+                  <Button variant="link" asChild onClick={onLogout}>
+                    <Link className={classes.a} href="/">
+                      로그아웃
+                    </Link>
+                  </Button>
+                </li>
+              </>
+            ) : (
+              <li className={classes.li}>
+                <Button variant="link" asChild>
+                  <Link className={classes.a} href="/login">
+                    로그인/회원가입
+                  </Link>
+                </Button>
+              </li>
+            )}
+          </ul>
+        </nav>
+      )}
+    </>
   )
 }
