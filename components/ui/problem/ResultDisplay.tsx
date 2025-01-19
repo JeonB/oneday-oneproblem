@@ -37,11 +37,11 @@ export const ResultDisplay = ({
             <div>
               <h4 className="mb-2 text-lg font-bold">Test Case {index + 1}</h4>
               <p>
-                <span className="font-medium">Expected:</span>{' '}
+                <span className="font-medium">기댓값:</span>{' '}
                 <span className="font-mono">{formatResult(result.output)}</span>
               </p>
               <p>
-                <span className="font-medium">Got:</span>{' '}
+                <span className="font-medium">입력값:</span>{' '}
                 <span className="font-mono">{formatResult(result.result)}</span>
               </p>
               <p className="mt-2">
