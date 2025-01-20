@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import CardsCreateAccount from './sign-up-form'
 import { useRouter } from 'next/navigation'
-import { useSignInAndUpStore } from '../../context/Store'
+import { useSignInAndUpStore } from '@/components/context/Store'
 import { signIn } from 'next-auth/react'
 
 const SignUp: React.FC = () => {
@@ -10,24 +10,26 @@ const SignUp: React.FC = () => {
   const [error, setError] = useState('')
   const router = useRouter()
 
-  const handleSignUp = async (e: React.FormEvent) => {
+  const handleSignUp = async (e: React.FormEvent, file?: File | null) => {
     e.preventDefault()
 
     try {
+      const formData = new FormData()
+      formData.append('name', name)
+      formData.append('email', email)
+      formData.append('password', password)
+
+      if (file) {
+        formData.append('profileImage', file)
+      }
       const response = await fetch('/api/user', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, email, password }),
+        body: formData,
       })
 
       if (!response.ok) {
         throw new Error('회원가입 실패')
       }
-
-      const data = await response.json()
-      console.log('User signed up successfully:', data)
 
       alert('회원가입에 성공했습니다.')
 

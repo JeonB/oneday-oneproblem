@@ -31,7 +31,6 @@ export default async function Page() {
   try {
     const email = session.user?.email
     const user = await User.findOne({ email })
-
     const isYesterday = dayjs(user.lastSolvedDate).isSame(
       dayjs().subtract(1, 'day'),
       'day',
@@ -62,7 +61,9 @@ export default async function Page() {
       totalProblemsSolved: user?.totalProblemsSolved || 0,
       username: user?.name || '',
       password: '',
+      profileImage: user?.profileImage || null,
     }
+
     return (
       <div className="flex min-h-screen flex-col items-center px-6 py-10 text-gray-100">
         <main className="w-full max-w-5xl space-y-12">

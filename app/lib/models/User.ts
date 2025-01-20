@@ -8,6 +8,7 @@ export interface UserProps {
   streak: number
   totalProblemsSolved: number
   lastSolvedDate: string
+  profileImage?: string
 }
 
 const UserSchema: Schema = new mongoose.Schema({
@@ -35,6 +36,9 @@ const UserSchema: Schema = new mongoose.Schema({
   lastSolvedDate: {
     type: String,
     default: () => new Date().toISOString().split('T')[0],
+  },
+  profileImage: {
+    type: String,
   },
 })
 

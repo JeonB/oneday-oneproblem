@@ -28,11 +28,11 @@ export const authOptions: NextAuthOptions = {
         if (!isPasswordValid) {
           throw new Error('아이디 또는 비밀번호가 일치하지 않습니다')
         }
-
         return {
-          id: user._id.toString(),
           name: user.name,
           email: user.email,
+          id: user._id.toString(),
+          image: user.profileImage || '',
         }
       },
     }),
@@ -51,6 +51,7 @@ export const authOptions: NextAuthOptions = {
         session.user.name = token.name
         session.user.id = token.id
         session.user.email = token.email
+        session.user.image = token.image
       }
       return session
     },
@@ -59,6 +60,7 @@ export const authOptions: NextAuthOptions = {
         token.name = user.name
         token.id = user.id
         token.email = user.email
+        token.image = user.image
       }
       return token
     },

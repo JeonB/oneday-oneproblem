@@ -2,12 +2,21 @@ import { NextRequest, NextResponse } from 'next/server'
 import { connectDB } from '@/app/lib/connecter'
 import bcrypt from 'bcryptjs'
 import User from '@/app/lib/models/User'
+import { promises as fs } from 'fs'
+import path from 'path'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/lib/authoptions'
 
+// 이미지 업로드 경로 설정
+const uploadDir = path.join(process.cwd(), 'public/upload')
+
 export async function POST(req: NextRequest) {
   await connectDB()
-  const { name, email, password } = await req.json()
+  const formData = await req.formData()
+  const email = formData.get('email') as string
+  const name = formData.get('name') as string
+  const password = formData.get('password') as string
+  const profileImage = formData.get('profileImage') as File | null
 
   const userExists = await User.findOne({ email })
   if (userExists) {
@@ -19,12 +28,27 @@ export async function POST(req: NextRequest) {
 
   const hashedPassword = await bcrypt.hash(password, 10)
 
+  let imagePath = null
+  if (profileImage) {
+    const fileName = `${email}_${Date.now()}_${profileImage.name}`
+    const filePath = path.join(uploadDir, fileName)
+
+    // 업로드 폴더 생성 (존재하지 않으면)
+    await fs.mkdir(uploadDir, { recursive: true })
+
+    // 파일 저장
+    const buffer = Buffer.from(await profileImage.arrayBuffer())
+    await fs.writeFile(filePath, buffer)
+
+    imagePath = `/upload/${fileName}` // 이미지 URL 경로
+  }
   const newUser = {
     name,
     email,
     password: hashedPassword,
+    profileImage: imagePath,
   }
-  User.insertMany(newUser)
+  await User.insertMany(newUser)
 
   return NextResponse.json({ status: 201 })
 }
@@ -42,14 +66,42 @@ export async function GET(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     await connectDB()
-    const { email, name, password } = await req.json()
 
+    // 요청 데이터 처리
+    const formData = await req.formData()
+    const email = formData.get('email') as string
+    const name = formData.get('name') as string
+    const password = formData.get('password') as string
+    const profileImage = formData.get('profileImage') as File | null
+
+    // 비밀번호 암호화
     const hashedPassword = await bcrypt.hash(password, 10)
-    const user = await User.findOneAndUpdate(
-      { email },
-      { name, password: hashedPassword },
-      { new: true },
-    ).lean()
+
+    // 프로필 이미지 저장
+    let imagePath = null
+    if (profileImage) {
+      const fileName = `${email}_${Date.now()}_${profileImage.name}`
+      const filePath = path.join(uploadDir, fileName)
+
+      // 업로드 폴더 생성 (존재하지 않으면)
+      await fs.mkdir(uploadDir, { recursive: true })
+
+      // 파일 저장
+      const buffer = Buffer.from(await profileImage.arrayBuffer())
+      await fs.writeFile(filePath, buffer)
+
+      imagePath = `/upload/${fileName}` // 이미지 URL 경로
+    }
+
+    // 사용자 데이터 업데이트
+    const updateData: Record<string, any> = { name, password: hashedPassword }
+    if (imagePath) {
+      updateData.profileImage = imagePath
+    }
+
+    const user = await User.findOneAndUpdate({ email }, updateData, {
+      new: true,
+    }).lean()
 
     if (!user) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 })

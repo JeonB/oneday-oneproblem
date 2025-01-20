@@ -2,12 +2,13 @@
 
 import Link from 'next/link'
 import { useRouter, usePathname } from 'next/navigation'
-import { Button } from '../ui/button'
+import { Button } from '@/components/ui/button'
 import classes from './header.module.css'
 import { signOut, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import logoImg from '@/public/images/logo.png'
 import { useAuthStore } from '@/components/context/Store'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 export default function Header() {
   const router = useRouter()
@@ -41,8 +42,19 @@ export default function Header() {
             {loginState ? (
               <>
                 <li className={classes.li}>
-                  <Link className={classes.a} href="/profile">
-                    {session?.user?.name}
+                  <Link className="flex flex-row items-center" href="/profile">
+                    <Avatar>
+                      <AvatarImage
+                        src={
+                          session?.user?.image ||
+                          '/images/avatar-placeholder.png'
+                        }
+                        alt="@shadcn"
+                        className="object-cover"
+                      />
+                      <AvatarFallback> {session?.user?.name}</AvatarFallback>
+                    </Avatar>
+                    <div className="ml-2">{session?.user?.name}</div>
                   </Link>
                 </li>
                 <li className={classes.li}>

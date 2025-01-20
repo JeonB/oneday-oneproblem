@@ -15,10 +15,12 @@ import { Label } from '@/components/ui/label'
 import { useSignInAndUpStore } from '@/components/context/Store'
 import { useDebouncedCallback } from 'use-debounce'
 import { signIn } from 'next-auth/react'
+import Image from 'next/image'
+import { useState } from 'react'
 
 interface SignUpFormProps {
   error: string
-  onSubmit: (e: React.FormEvent) => void
+  onSubmit: (e: React.FormEvent, file?: File | null) => void
 }
 
 export const CardsCreateAccount: React.FC<SignUpFormProps> = ({
@@ -26,6 +28,17 @@ export const CardsCreateAccount: React.FC<SignUpFormProps> = ({
   onSubmit,
 }) => {
   const { setName, setEmail, setPassword } = useSignInAndUpStore()
+  const [preview, setPreview] = useState<string | null>(null)
+
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setPreview(URL.createObjectURL(file))
+      setSelectedFile(file)
+    }
+  }
 
   const debouncedSetName = useDebouncedCallback((value: string) => {
     setName(value)
@@ -39,7 +52,7 @@ export const CardsCreateAccount: React.FC<SignUpFormProps> = ({
     setPassword(value)
   }, 300)
   return (
-    <form onSubmit={onSubmit}>
+    <form onSubmit={e => onSubmit(e, selectedFile)}>
       <Card className="mx-auto w-full max-w-lg p-6 lg:max-w-xl">
         <CardHeader className="space-y-2">
           <CardTitle className="text-3xl">1일 1문제 계정 생성</CardTitle>
@@ -96,6 +109,26 @@ export const CardsCreateAccount: React.FC<SignUpFormProps> = ({
               type="password"
               onChange={e => debouncedSetPassword(e.target.value)}
             />
+          </div>
+          <div className="grid gap-4">
+            <Label htmlFor="picture">프로필 이미지</Label>
+            <Input
+              id="picture"
+              type="file"
+              placeholder="프로필 이미지를 업로드하세요"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+            <div className="mt-2">
+              <Image
+                onClick={() => document.getElementById('picture')?.click()}
+                src={preview || '/images/avatar-placeholder.png'}
+                alt="Profile Preview"
+                width={80}
+                height={80}
+                className="h-20 w-20 cursor-pointer rounded-full object-cover"
+              />
+            </div>
           </div>
         </CardContent>
         <CardFooter>
