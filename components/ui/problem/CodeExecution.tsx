@@ -53,6 +53,7 @@ export default function CodeExecution() {
   const [results, setResults] = useState<TestResult[]>([])
   const [feedback, setFeedback] = useState<FeedbackState | null>(null)
   const [isLoadingFeedback, setLoadingFeedback] = useState(false)
+  const [problemSolved, setProblemSolved] = useState(false)
   const { data: session } = useSession()
   const { title, topic, difficulty, content, userSolution, inputOutput } =
     useProblemStore()
@@ -61,6 +62,7 @@ export default function CodeExecution() {
   const userId = session?.user?.id
 
   const runCode = useCallback(async () => {
+    setProblemSolved(false)
     setFeedback(null)
     const problemData = { inputOutput, userSolution }
     setResults([])
@@ -120,6 +122,7 @@ export default function CodeExecution() {
 
       if (response.ok) {
         alert('문제를 성공적으로 풀었습니다!')
+        setProblemSolved(true)
       } else {
         throw new Error('문제 풀이 업데이트에 실패했습니다.')
       }
@@ -131,12 +134,13 @@ export default function CodeExecution() {
 
   useEffect(() => {
     if (
+      !problemSolved &&
       results.length > 0 &&
       results.every(result => !result.error && result.passed)
     ) {
       handleProblemSolve()
     }
-  }, [results, handleProblemSolve])
+  }, [results, problemSolved, handleProblemSolve])
 
   return (
     <div>
