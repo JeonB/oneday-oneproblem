@@ -10,65 +10,26 @@ const isValidJson = (str: string) => {
     return false
   }
 }
+
 // AI가 생성한 테스트 케이스 파싱
 const parseTestCases = (aiGeneratedContent: AiGeneratedContent[]) => {
-  const testCases: { input: any[]; output: any }[] = []
+  return aiGeneratedContent.slice(1).map(({ input, output }) => {
+    if (!input || !output) {
+      throw new Error(
+        'Invalid AI generated content: input or output is missing',
+      )
+    }
 
-  try {
-    const content = aiGeneratedContent.slice(1)
-    content.forEach(example => {
-      if (!example.input || !example.output) {
-        throw new Error(
-          'Invalid AI generated content: input or output is missing',
-        )
-      }
+    const parsedInput = Array.isArray(input)
+      ? input.map(item => (isValidJson(item) ? JSON.parse(item) : item))
+      : [isValidJson(input as string) ? JSON.parse(input as string) : input]
 
-      const input = Array.isArray(example.input)
-        ? example.input.map(item =>
-            isValidJson(item) ? JSON.parse(item) : item,
-          )
-        : [
-            isValidJson(example.input as string)
-              ? JSON.parse(example.input as string)
-              : example.input,
-          ]
+    const parsedOutput = isValidJson(output as string)
+      ? JSON.parse(output as string)
+      : output
 
-      const output = isValidJson(example.output as string)
-        ? JSON.parse(example.output as string)
-        : example.output
-      testCases.push({ input, output })
-    })
-  } catch (e) {
-    console.error(e)
-  }
-
-  return testCases
-}
-
-// 추가적인 테스트 케이스 생성
-const generateDynamicTestCases = (
-  constraints: { min: number; max: number; length: number },
-  solution: (...args: any[]) => any,
-) => {
-  const dynamicTestCases: { input: any[]; output: any }[] = []
-
-  for (let i = 0; i < 5; i++) {
-    // 입력값 생성
-    const length = Math.floor(Math.random() * constraints.length) + 1 // 길이 제한 설정
-    const input = Array.from(
-      { length },
-      () =>
-        Math.floor(Math.random() * (constraints.max - constraints.min + 1)) +
-        constraints.min,
-    )
-
-    // 정답 생성
-    const output = solution(input)
-
-    dynamicTestCases.push({ input: [input], output })
-  }
-
-  return dynamicTestCases
+    return { input: parsedInput, output: parsedOutput }
+  })
 }
 
 // 깊은 비교 함수 (배열 포함)
@@ -83,35 +44,62 @@ const deepEqual = (a: any, b: any): boolean => {
 
 export async function POST(req: NextRequest) {
   const { problemData } = await req.json()
-  const { userSolution, inputOutput, constraints } = problemData
+  const { userSolution, inputOutput } = problemData
 
-  // AI가 제공한 테스트 케이스 파싱
-  const testCases = parseTestCases(inputOutput)
+  try {
+    // AI가 제공한 테스트 케이스 파싱
+    const testCases = parseTestCases(inputOutput)
 
-  const wrappedCode = `
+    // 사용자 코드를 실행 가능한 함수로 변환
+    const wrappedCode = `
     ${userSolution}
     return solution;
   `
+    const solutionFunction = new Function(wrappedCode)
 
-  try {
-    // 사용자 제출 코드를 함수로 변환
-    const solution = new Function(wrappedCode)()
-
-    // 기존 테스트 케이스 검증
-    const results = []
-    for (const { input, output } of testCases) {
-      const result = solution(...input)
-      const passed = deepEqual(result, output)
-      results.push({ input, output, result, passed })
+    const solution = solutionFunction() // 반환된 solution 함수
+    if (typeof solution !== 'function') {
+      throw new Error('The provided solution is not a valid function.')
     }
+    console.log(solution)
+    // 테스트 케이스 검증
+    const results = testCases.map(({ input, output }) => {
+      try {
+        const testCode = `
+        const capturedLogs = [];
+        const originalConsoleLog = console.log;
 
-    // 내부적으로 동적 테스트 케이스 생성 및 검증
-    // const dynamicTestCases = generateDynamicTestCases(constraints, solution)
-    // for (const { input, output } of dynamicTestCases) {
-    //   const result = solution(...input)
-    //   const passed = deepEqual(result, output)
-    //   results.push({ input, output, result, passed })
-    // }
+        console.log = function (...args) {
+          capturedLogs.push(args.join(" "));
+          originalConsoleLog.apply(console, args);
+        };
+
+        const result = solution(...${JSON.stringify(input)});
+
+        console.log = originalConsoleLog;
+        return { result, capturedLogs };
+      `
+        const testFunction = new Function('solution', testCode)
+        const { result, capturedLogs } = testFunction(solution)
+
+        return {
+          input,
+          output,
+          result,
+          passed: deepEqual(result, output),
+          logs: capturedLogs,
+        }
+      } catch (error) {
+        return {
+          input,
+          output,
+          result: null,
+          passed: false,
+          logs: [],
+          error: (error as Error).message,
+        }
+      }
+    })
 
     return NextResponse.json({ results }, { status: 200 })
   } catch (error) {
