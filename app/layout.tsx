@@ -23,8 +23,8 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   metadataBase:
     process.env.NODE_ENV !== 'production'
-      ? new URL(process.env.NEXT_PUBLIC_API_URL!)
-      : new URL(process.env.NEXTAUTH_URL!),
+      ? new URL(process.env.DEV_URL!)
+      : new URL(process.env.PRODUCTION_URL!),
   title: {
     template: '%s | 1일 1문제',
     default: '1일 1문제',

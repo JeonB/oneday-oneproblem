@@ -8,9 +8,11 @@ import CardListSkeleton from '@/components/ui/problem/CardListSkeleton'
 const MainPage = async () => {
   const url =
     process.env.NODE_ENV !== 'production'
-      ? process.env.NEXT_PUBLIC_API_URL
-      : process.env.NEXTAUTH_URL
-  const data = await fetch(url + 'api/algorithms')
+      ? process.env.DEV_URL
+      : process.env.PRODUCTION_URL
+  const data = await fetch(url + 'api/algorithms', {
+    next: { revalidate: 0 },
+  })
   const algorithms: Algorithm[] = await data.json()
   return (
     <div>
@@ -31,9 +33,13 @@ const MainPage = async () => {
           </div>
         </div>
       </div>
-      <Suspense fallback={<CardListSkeleton />}>
-        <CardList algorithms={algorithms} />
-      </Suspense>
+      <div className="mb-10 flex justify-center">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          <Suspense fallback={<CardListSkeleton />}>
+            <CardList algorithms={algorithms} />
+          </Suspense>
+        </div>
+      </div>
     </div>
   )
 }
