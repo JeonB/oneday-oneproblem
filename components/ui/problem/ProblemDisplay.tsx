@@ -10,6 +10,7 @@ import Image from 'next/image'
 import logoImg from '@/public/images/logo.png'
 import { useState, useEffect } from 'react'
 import { AiGeneratedContent } from '@/components/context/StoreContext'
+import { useProblemSetup } from '@/hooks/useProblemSetup'
 
 const ProblemDisplay = ({
   difficulty,
@@ -18,38 +19,7 @@ const ProblemDisplay = ({
   difficulty: string
   initialContent: string
 }) => {
-  const {
-    content,
-    setContent,
-    setTitle,
-    setInputOutput,
-    setDifficulty,
-    setUserSolution,
-  } = useProblemStore()
-
-  const [parsedData, setParsedData] = useState<{
-    title: string
-    examples: AiGeneratedContent[]
-  }>({ title: '', examples: [] })
-  const [initialInput, setInitialInput] = useState<string | string[]>('')
-  useEffect(() => {
-    if (!parsedData.examples.length) {
-      const parsed = parseInputOutputExamples(initialContent)
-      setParsedData(parsed)
-
-      if (parsed.examples.length > 0) {
-        setInitialInput(parsed.examples[0].input)
-      }
-    }
-  }, [initialContent, parsedData])
-
-  if (!content && parsedData) {
-    setContent(initialContent)
-    setTitle(parsedData.title)
-    setInputOutput(parsedData.examples)
-    setDifficulty(difficulty)
-  }
-
+  const { content, initialInput } = useProblemSetup(initialContent, difficulty)
   return (
     <PanelGroup direction="horizontal">
       <Panel defaultSizePercentage={40} minSizePercentage={30}>
