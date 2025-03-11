@@ -22,7 +22,7 @@ import { Icons } from '@/components/icons'
 import { useState } from 'react'
 import { ProblemProps } from '@/app/lib/models/Problem'
 import { useRouter } from 'next/navigation'
-import { useProblemStore } from '@/components/context/Store'
+import { useProblemStore } from '@/components/context/StoreContext'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -49,7 +49,8 @@ export function DataTable<TData, TValue>({
   })
 
   const router = useRouter()
-  const { setUserSolution, setContent } = useProblemStore()
+  const setUserSolution = useProblemStore(state => state.setUserSolution)
+  const setContent = useProblemStore(state => state.setContent)
   return (
     <div className={className}>
       <div className="rounded-md border">

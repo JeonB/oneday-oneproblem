@@ -1,15 +1,11 @@
 'use client'
 
-import { useProblemStore } from '@/components/context/Store'
 import CodeEditor from '@/components/ui/problem/CodeEditor'
 import CodeExecution from '@/components/ui/problem/CodeExecution'
-import { parseInputOutputExamples } from '@/app/lib/parseProblem'
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 import Link from 'next/link'
 import Image from 'next/image'
 import logoImg from '@/public/images/logo.png'
-import { useState, useEffect } from 'react'
-import { AiGeneratedContent } from '@/components/context/StoreContext'
 import { useProblemSetup } from '@/hooks/useProblemSetup'
 
 const ProblemDisplay = ({
@@ -35,7 +31,6 @@ const ProblemDisplay = ({
                 1일 1문제
               </div>
             </Link>
-            {/* 문제 콘텐츠 렌더링 */}
             <div dangerouslySetInnerHTML={{ __html: content }}></div>
           </div>
         </div>

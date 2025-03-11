@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { Button } from '../button'
-import { useProblemStore } from '@/components/context/Store'
+import { useProblemStore } from '@/components/context/StoreContext'
 
 export default function TodayProblemButton() {
   const router = useRouter()
@@ -10,12 +10,14 @@ export default function TodayProblemButton() {
   const getRandomDifficulty = () =>
     ['easy', 'normal', 'hard'][Math.floor(Math.random() * 3)]
 
+  const setTopic = useProblemStore(state => state.setTopic)
+  const setContent = useProblemStore(state => state.setContent)
+  const setUserSolution = useProblemStore(state => state.setUserSolution)
+
   const updateProblemStore = () => {
-    useProblemStore.setState({
-      topic: '',
-      content: '',
-      userSolution: '',
-    })
+    setTopic('')
+    setContent('')
+    setUserSolution('')
   }
 
   return (

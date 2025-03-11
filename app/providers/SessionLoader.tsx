@@ -1,11 +1,11 @@
 'use client'
 import { useSession } from 'next-auth/react'
 import { ReactNode, useEffect } from 'react'
-import { useAuthStore } from '@/components/context/Store'
+import { useAuthStore } from '@/components/context/StoreContext'
 
 function SessionLoader({ children }: { children: ReactNode }) {
   const { status, data: session } = useSession()
-  const { setLoginState } = useAuthStore()
+  const setLoginState = useAuthStore(state => state.setLoginState)
   const isLogin = !!session && status === 'authenticated'
 
   useEffect(() => {

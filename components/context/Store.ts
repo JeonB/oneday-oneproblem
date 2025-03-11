@@ -1,13 +1,20 @@
-import { create } from 'zustand'
-import { Algorithm } from '@/app/lib/models/Algorithms'
-import { persist } from 'zustand/middleware'
+import { create, StoreApi } from 'zustand'
 
-interface AuthState {
+export interface AuthState {
   loginState: boolean
   setLoginState: (state: boolean) => void
 }
+export const initAuthStore = (): AuthState => ({
+  loginState: false,
+  setLoginState: () => {},
+})
+export const createAuthStore = (initState: AuthState): StoreApi<AuthState> =>
+  create<AuthState>()(set => ({
+    ...initState,
+    setLoginState: state => set({ loginState: state }),
+  }))
 
-interface SignUpState {
+export interface SignInAndUpState {
   name: string
   email: string
   password: string
@@ -15,20 +22,30 @@ interface SignUpState {
   setEmail: (email: string) => void
   setPassword: (password: string) => void
 }
+export const initSignUpStore = (): SignInAndUpState => ({
+  name: '',
+  email: '',
+  password: '',
+  setName: () => {},
+  setEmail: () => {},
+  setPassword: () => {},
+})
+export const createSignInAndUpStore = (
+  initState: SignInAndUpState,
+): StoreApi<SignInAndUpState> =>
+  create<SignInAndUpState>()(set => ({
+    ...initState,
+    setName: name => set({ name }),
+    setEmail: email => set({ email }),
+    setPassword: password => set({ password }),
+  }))
 
-interface AlgorithmState {
-  isLoading: boolean
-  algorithms: Algorithm[]
-  setAlgorithms: (algorithms: Algorithm[]) => void
-  fetchAlgorithms: () => Promise<void>
-}
-
-export type AiGeneratedContent = {
+export interface AiGeneratedContent {
   input: string[] | string
   output: string | string[] | undefined
 }
 
-interface ProblemState {
+export interface ProblemState {
   title: string
   topic: string
   difficulty: string
@@ -42,87 +59,29 @@ interface ProblemState {
   setUserSolution: (userSolution: string) => void
   setContent: (content: string) => void
 }
-
-export const useAuthStore = create<AuthState>()(
-  persist(
-    set => ({
-      loginState: false,
-      setLoginState: state => set({ loginState: state }),
-    }),
-    {
-      name: 'auth-store',
-    },
-  ),
-)
-
-export const useSignInAndUpStore = create<SignUpState>()(
-  persist(
-    set => ({
-      name: '',
-      email: '',
-      password: '',
-      setName: name => set({ name }),
-      setEmail: email => set({ email }),
-      setPassword: password => set({ password }),
-    }),
-    {
-      name: 'signup-store',
-    },
-  ),
-)
-
-export const useAlgorithmStore = create<AlgorithmState>()(
-  persist(
-    (set, get) => ({
-      algorithms: [],
-      isLoading: false,
-      setAlgorithms: algorithms => set({ algorithms }),
-      fetchAlgorithms: async () => {
-        set({ isLoading: true })
-        try {
-          const response = await fetch('/api/algorithms')
-          if (!response.ok) {
-            throw new Error(
-              `Failed to fetch algorithms: ${response.statusText}`,
-            )
-          }
-          const data: Algorithm[] = await response.json()
-          set({ algorithms: data })
-        } catch (error) {
-          console.error('Failed to fetch algorithms:', error)
-        } finally {
-          set({ isLoading: false })
-        }
-      },
-    }),
-    {
-      name: 'algorithm-store',
-    },
-  ),
-)
-
-export const useProblemStore = create(
-  persist(
-    set => ({
-      title: '',
-      topic: '',
-      difficulty: '',
-      inputOutput: [],
-      userSolution: '',
-      content: '',
-      setTitle: title => set({ title }),
-      setTopic: topic => set({ topic }),
-      setDifficulty: difficulty => set({ difficulty }),
-      setInputOutput: inputOutput => set({ inputOutput }),
-      setUserSolution: userSolution => set({ userSolution }),
-      setContent: content => set({ content }),
-    }),
-    {
-      name: 'problem-store',
-      partialize: (state: ProblemState) => ({
-        content: state.content,
-        userSolution: state.userSolution,
-      }),
-    },
-  ),
-)
+export const initProblemStore = (): ProblemState => ({
+  title: '',
+  topic: '',
+  difficulty: '',
+  inputOutput: [],
+  userSolution: '',
+  content: '',
+  setTitle: () => {},
+  setTopic: () => {},
+  setDifficulty: () => {},
+  setInputOutput: () => {},
+  setUserSolution: () => {},
+  setContent: () => {},
+})
+export const createProblemStore = (
+  initState: ProblemState,
+): StoreApi<ProblemState> =>
+  create<ProblemState>()(set => ({
+    ...initState,
+    setTitle: title => set({ title }),
+    setTopic: topic => set({ topic }),
+    setDifficulty: difficulty => set({ difficulty }),
+    setInputOutput: inputOutput => set({ inputOutput }),
+    setUserSolution: userSolution => set({ userSolution }),
+    setContent: content => set({ content }),
+  }))

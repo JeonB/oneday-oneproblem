@@ -4,10 +4,11 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import LoginForm from './login-form'
 import { signIn } from 'next-auth/react'
-import { useSignInAndUpStore } from '../../context/Store'
+import { useSignInAndUpStore } from '@/components/context/StoreContext'
 
 const Login: React.FC = () => {
-  const { email, password } = useSignInAndUpStore()
+  const email = useSignInAndUpStore(state => state.email)
+  const password = useSignInAndUpStore(state => state.password)
   const [error, setError] = useState('')
 
   const router = useRouter()

@@ -7,13 +7,14 @@ import classes from './header.module.css'
 import { signOut, useSession } from 'next-auth/react'
 import Image from 'next/image'
 import logoImg from '@/public/images/logo.png'
-import { useAuthStore } from '@/components/context/Store'
+import { useAuthStore } from '@/components/context/StoreContext'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 export default function Header() {
   const router = useRouter()
   const { data: session } = useSession()
-  const { loginState, setLoginState } = useAuthStore()
+  const loginState = useAuthStore(state => state.loginState)
+  const setLoginState = useAuthStore(state => state.setLoginState)
   const onLogout = async () => {
     await signOut({ redirect: false })
     setLoginState(false)

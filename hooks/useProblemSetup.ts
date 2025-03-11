@@ -1,12 +1,17 @@
 import { useState, useEffect } from 'react'
 import { parseInputOutputExamples } from '@/app/lib/parseProblem'
-import { useProblemStore } from '@/components/context/Store'
-import { AiGeneratedContent } from '@/components/context/StoreContext'
+import { useProblemStore } from '@/components/context/StoreContext'
+import { AiGeneratedContent } from '@/components/context/Store'
 
 export const useProblemSetup = (initialContent: string, difficulty: string) => {
-  const { content, setContent, setTitle, setInputOutput, setDifficulty } =
-    useProblemStore()
-
+  const [content, setContent, setTitle, setInputOutput, setDifficulty] =
+    useProblemStore(state => [
+      state.content,
+      state.setContent,
+      state.setTitle,
+      state.setInputOutput,
+      state.setDifficulty,
+    ])
   const [parsedData, setParsedData] = useState<{
     title: string
     examples: AiGeneratedContent[]

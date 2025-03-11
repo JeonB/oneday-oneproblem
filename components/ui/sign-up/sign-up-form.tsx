@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { useSignInAndUpStore } from '@/components/context/Store'
+import { useSignInAndUpStore } from '@/components/context/StoreContext'
 import { useDebouncedCallback } from 'use-debounce'
 import { signIn } from 'next-auth/react'
 import Image from 'next/image'
@@ -27,7 +27,9 @@ export const CardsCreateAccount: React.FC<SignUpFormProps> = ({
   error,
   onSubmit,
 }) => {
-  const { setName, setEmail, setPassword } = useSignInAndUpStore()
+  const setName = useSignInAndUpStore(state => state.setName)
+  const setEmail = useSignInAndUpStore(state => state.setEmail)
+  const setPassword = useSignInAndUpStore(state => state.setPassword)
   const [preview, setPreview] = useState<string | null>(null)
 
   const [selectedFile, setSelectedFile] = useState<File | null>(null)

@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
-import { useProblemStore } from '@/components/context/Store'
+import { useProblemStore } from '@/components/context/StoreContext'
 import generateFeedback from '@/app/lib/generateFeedback'
 import clsx from 'clsx'
 import { Feedback, FeedbackState } from './Feedback'
@@ -55,8 +55,15 @@ export default function CodeExecution() {
   const [isLoadingFeedback, setLoadingFeedback] = useState(false)
   const [problemSolved, setProblemSolved] = useState(false)
   const { data: session } = useSession()
-  const { title, topic, difficulty, content, userSolution, inputOutput } =
-    useProblemStore()
+  const [title, topic, difficulty, content, userSolution, inputOutput] =
+    useProblemStore(state => [
+      state.title,
+      state.topic,
+      state.difficulty,
+      state.content,
+      state.userSolution,
+      state.inputOutput,
+    ])
 
   const email = session?.user?.email
   const userId = session?.user?.id

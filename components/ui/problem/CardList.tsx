@@ -4,16 +4,18 @@ import Card from './AlgorithmCard'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import DifficultyModal from './DifficultyModal'
-import { useProblemStore } from '@/components/context/Store'
+import { useProblemStore } from '@/components/context/StoreContext'
 export default function CardList({ algorithms }: { algorithms: Algorithm[] }) {
   const router = useRouter()
 
+  const setTopic = useProblemStore(state => state.setTopic)
+  const setContent = useProblemStore(state => state.setContent)
+  const setUserSolution = useProblemStore(state => state.setUserSolution)
+
   const updateProblemStore = (algorithm: Algorithm) => {
-    useProblemStore.setState({
-      topic: algorithm.topic,
-      content: '',
-      userSolution: '',
-    })
+    setTopic(algorithm.topic)
+    setContent('')
+    setUserSolution('')
   }
 
   const [selectedAlgorithm, setSelectedAlgorithm] = useState<Algorithm | null>(

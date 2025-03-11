@@ -4,7 +4,7 @@ import { javascript } from '@codemirror/lang-javascript'
 import { java } from '@codemirror/lang-java'
 import { cpp } from '@codemirror/lang-cpp'
 import { python } from '@codemirror/lang-python'
-import { useProblemStore } from '@/components/context/Store'
+import { useProblemStore } from '@/components/context/StoreContext'
 import { abcdef } from '@uiw/codemirror-themes-all'
 
 export default function CodeEditor({
@@ -12,7 +12,7 @@ export default function CodeEditor({
 }: {
   initialInput: string | string[]
 }) {
-  const setUserSolution = useProblemStore(set => set.setUserSolution)
+  const setUserSolution = useProblemStore(state => state.setUserSolution)
   const userSolution = useProblemStore(state => state.userSolution)
   const [language, setLanguage] = useState('javascript')
   const [template, setTemplate] = useState('')

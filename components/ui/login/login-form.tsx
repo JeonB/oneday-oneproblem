@@ -12,7 +12,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import React from 'react'
 import { signIn } from 'next-auth/react'
-import { useSignInAndUpStore } from '@/components/context/Store'
+import { useSignInAndUpStore } from '@/components/context/StoreContext'
 import { useDebouncedCallback } from 'use-debounce'
 import { Icons } from '@/components/icons'
 
@@ -22,7 +22,8 @@ interface LoginFormProps {
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ error, onSubmit }) => {
-  const { setEmail, setPassword } = useSignInAndUpStore()
+  const setEmail = useSignInAndUpStore(state => state.setEmail)
+  const setPassword = useSignInAndUpStore(state => state.setPassword)
 
   const debouncedSetEmail = useDebouncedCallback((value: string) => {
     setEmail(value)

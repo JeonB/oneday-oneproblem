@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { signOut, useSession } from 'next-auth/react'
-import { useAuthStore } from '@/components/context/Store'
+import { useAuthStore } from '@/components/context/StoreContext'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 
@@ -57,7 +57,7 @@ export function ProfileForm({ defaultValues }: ProfileFormProps) {
     mode: 'onChange',
   })
   const { data: session } = useSession()
-  const { setLoginState } = useAuthStore()
+  const setLoginState = useAuthStore(state => state.setLoginState)
   const router = useRouter()
   const [preview, setPreview] = useState<string | null>(null)
 
