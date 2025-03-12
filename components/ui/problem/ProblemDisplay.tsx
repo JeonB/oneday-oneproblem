@@ -7,6 +7,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import logoImg from '@/public/images/logo.png'
 import { useProblemSetup } from '@/hooks/useProblemSetup'
+import { parseInputOutputExamples } from '@/app/lib/parseProblem'
 
 const ProblemDisplay = ({
   difficulty,
@@ -15,7 +16,10 @@ const ProblemDisplay = ({
   difficulty: string
   initialContent: string
 }) => {
-  const { content, initialInput } = useProblemSetup(initialContent, difficulty)
+  // const { content, initialInput } = useProblemSetup(initialContent, difficulty)
+
+  const parsedData = parseInputOutputExamples(initialContent)
+
   return (
     <PanelGroup direction="horizontal">
       <Panel defaultSizePercentage={40} minSizePercentage={30}>
@@ -31,7 +35,7 @@ const ProblemDisplay = ({
                 1일 1문제
               </div>
             </Link>
-            <div dangerouslySetInnerHTML={{ __html: content }}></div>
+            <div dangerouslySetInnerHTML={{ __html: initialContent }}></div>
           </div>
         </div>
       </Panel>
@@ -41,7 +45,7 @@ const ProblemDisplay = ({
           <Panel defaultSizePercentage={60} minSizePercentage={10}>
             <div className="flex h-full overflow-hidden">
               <div className="flex-1 overflow-auto">
-                <CodeEditor initialInput={initialInput} />
+                <CodeEditor initialInput={parsedData.examples[0].input} />
               </div>
             </div>
           </Panel>
