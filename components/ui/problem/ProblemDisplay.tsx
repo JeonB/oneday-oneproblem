@@ -6,20 +6,23 @@ import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 import Link from 'next/link'
 import Image from 'next/image'
 import logoImg from '@/public/images/logo.png'
-import { useProblemSetup } from '@/hooks/useProblemSetup'
 import { parseInputOutputExamples } from '@/app/lib/parseProblem'
+import { useState, useEffect } from 'react'
+import { AiGeneratedContent } from '@/components/context/Store'
 
-const ProblemDisplay = ({
-  difficulty,
-  initialContent,
-}: {
-  difficulty: string
-  initialContent: string
-}) => {
-  // const { content, initialInput } = useProblemSetup(initialContent, difficulty)
-
-  const parsedData = parseInputOutputExamples(initialContent)
-
+const ProblemDisplay = ({ initialContent }: { initialContent: string }) => {
+  const [parsedData, setParsedData] = useState<{
+    title: string
+    examples: AiGeneratedContent[]
+  }>({
+    title: '',
+    examples: [],
+  })
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setParsedData(parseInputOutputExamples(initialContent))
+    }
+  }, [initialContent])
   return (
     <PanelGroup direction="horizontal">
       <Panel defaultSizePercentage={40} minSizePercentage={30}>
@@ -45,7 +48,11 @@ const ProblemDisplay = ({
           <Panel defaultSizePercentage={60} minSizePercentage={10}>
             <div className="flex h-full overflow-hidden">
               <div className="flex-1 overflow-auto">
-                <CodeEditor initialInput={parsedData.examples[0].input} />
+                {parsedData.examples.length > 0 ? (
+                  <CodeEditor initialInput={parsedData.examples[0].input} />
+                ) : (
+                  <p>문제 데이터 로딩 중...</p>
+                )}
               </div>
             </div>
           </Panel>
@@ -54,7 +61,7 @@ const ProblemDisplay = ({
             <div className="flex h-full overflow-hidden">
               <div className="flex-1 overflow-auto p-4">
                 <h3 className="mb-2">실행 결과</h3>
-                <CodeExecution />
+                <CodeExecution inputOutput={parsedData.examples} />
               </div>
             </div>
           </Panel>
