@@ -30,9 +30,7 @@ const ProblemPage = async ({
     throw generatedProblem
   }
 
-  return (
-    <ProblemDisplay difficulty={difficulty} initialContent={generatedProblem} />
-  )
+  return <ProblemDisplay initialContent={generatedProblem} />
 }
 
 export default ProblemPage
