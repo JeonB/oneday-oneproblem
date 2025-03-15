@@ -12,7 +12,7 @@ const getCachedProblem = unstable_cache(
     }
   },
   ['problem'],
-  { revalidate: 3600 },
+  { revalidate: 300 },
 )
 
 const ProblemPage = async ({
