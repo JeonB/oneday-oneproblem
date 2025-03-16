@@ -1,4 +1,5 @@
 import { generateProblem } from '@/app/lib/generateProblem'
+import { parseInputOutputExamples } from '@/app/lib/parseProblem'
 import ProblemDisplay from '@/components/ui/problem/ProblemDisplay'
 import { unstable_cache } from 'next/cache'
 
@@ -30,7 +31,11 @@ const ProblemPage = async ({
     throw generatedProblem
   }
 
-  return <ProblemDisplay initialContent={generatedProblem} />
+  const parsedData = parseInputOutputExamples(generatedProblem)
+
+  return (
+    <ProblemDisplay initialContent={generatedProblem} parsedData={parsedData} />
+  )
 }
 
 export default ProblemPage

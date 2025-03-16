@@ -6,23 +6,15 @@ import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels'
 import Link from 'next/link'
 import Image from 'next/image'
 import logoImg from '@/public/images/logo.png'
-import { parseInputOutputExamples } from '@/app/lib/parseProblem'
-import { useState, useEffect } from 'react'
 import { AiGeneratedContent } from '@/components/context/Store'
 
-const ProblemDisplay = ({ initialContent }: { initialContent: string }) => {
-  const [parsedData, setParsedData] = useState<{
-    title: string
-    examples: AiGeneratedContent[]
-  }>({
-    title: '',
-    examples: [],
-  })
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setParsedData(parseInputOutputExamples(initialContent))
-    }
-  }, [initialContent])
+const ProblemDisplay = ({
+  initialContent,
+  parsedData,
+}: {
+  initialContent: string
+  parsedData: { title: string; examples: AiGeneratedContent[] }
+}) => {
   return (
     <PanelGroup direction="horizontal">
       <Panel defaultSizePercentage={40} minSizePercentage={30}>
