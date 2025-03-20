@@ -38,7 +38,6 @@ export default function CardList({ algorithms }: { algorithms: Algorithm[] }) {
             setModalOpen(true)
             setSelectedAlgorithm(algorithm)
           }}
-          topic={algorithm.topic}
           algorithm={algorithm.name}
           img={algorithm.img}
         />

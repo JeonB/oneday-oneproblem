@@ -40,11 +40,7 @@ const ProblemDisplay = ({
           <Panel defaultSizePercentage={60} minSizePercentage={10}>
             <div className="flex h-full overflow-hidden">
               <div className="flex-1 overflow-auto">
-                {parsedData.examples.length > 0 ? (
-                  <CodeEditor initialInput={parsedData.examples[0].input} />
-                ) : (
-                  <p>문제 데이터 로딩 중...</p>
-                )}
+                <CodeEditor initialInput={parsedData.examples[0].input} />
               </div>
             </div>
           </Panel>

@@ -61,7 +61,6 @@ export async function POST(req: NextRequest) {
     if (typeof solution !== 'function') {
       throw new Error('The provided solution is not a valid function.')
     }
-    console.log(solution)
     // 테스트 케이스 검증
     const results = testCases.map(({ input, output }) => {
       try {
