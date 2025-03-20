@@ -17,7 +17,6 @@ type Story = StoryObj<typeof meta>
 // 기본 예시
 export const Default: Story = {
   args: {
-    topic: '알고리즘 대주제',
     img: 'logoImg.png',
     algorithm: '알고리즘 이름',
   },
@@ -26,7 +25,6 @@ export const Default: Story = {
 // 제목을 포함한 카드 예시
 export const WithTitle: Story = {
   args: {
-    topic: '정렬',
     algorithm: 'Quick Sort',
   },
 }
@@ -34,7 +32,6 @@ export const WithTitle: Story = {
 // 내용과 함께한 카드 예시
 export const WithContent: Story = {
   args: {
-    topic: '탐색',
     algorithm: 'Binary Search',
   },
 }
