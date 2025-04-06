@@ -1,13 +1,13 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useProblemStore } from '@/components/context/StoreContext'
 import { Button } from '@/components/ui/button'
 import { ArrowLeft } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
-export default function ProblemDetailPage() {
+function ProblemDetailContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const topic = searchParams.get('topic')
@@ -54,5 +54,18 @@ export default function ProblemDetailPage() {
         <div className="whitespace-pre-wrap text-gray-300">{userSolution}</div>
       </div>
     </div>
+  )
+}
+
+export default function ProblemDetailPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-screen w-full items-center justify-center">
+          <p className="text-lg font-semibold text-gray-600">로딩 중...</p>
+        </div>
+      }>
+      <ProblemDetailContent />
+    </Suspense>
   )
 }
