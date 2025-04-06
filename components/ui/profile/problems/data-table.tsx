@@ -85,7 +85,9 @@ export function DataTable<TData, TValue>({
 
                     setContent(content)
                     setUserSolution(userSolution)
-                    router.push(`/problem/${topic}?difficulty=${difficulty}`)
+                    router.push(
+                      `/problem/detail?topic=${topic}&difficulty=${difficulty}`,
+                    )
                   }}>
                   {row.getVisibleCells().map(cell => (
                     <TableCell key={cell.id}>
