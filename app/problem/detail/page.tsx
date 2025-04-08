@@ -92,36 +92,38 @@ function ProblemDetailContent() {
         </h1>
       </div>
 
-      <div className="mb-8 rounded-lg bg-gray-800 p-6 shadow-md">
-        <h2 className="mb-4 text-xl font-semibold">문제 내용</h2>
-        <div
-          className="prose prose-invert max-w-none text-gray-300"
-          dangerouslySetInnerHTML={{ __html: content }}
-        />
-      </div>
-
-      <div className="rounded-lg bg-gray-800 p-6 shadow-md">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold">내 풀이</h2>
-          <select
-            value={language}
-            onChange={handleLanguageChange}
-            className="rounded-md bg-gray-700 px-3 py-1 text-sm text-gray-200">
-            <option value="javascript">JavaScript</option>
-            <option value="java">Java</option>
-            <option value="c">C</option>
-            <option value="cpp">C++</option>
-            <option value="python">Python</option>
-          </select>
-        </div>
-        <div className="overflow-hidden rounded-md border border-gray-700">
-          <CodeMirror
-            value={userSolution}
-            theme={abcdef}
-            extensions={[getLanguageExtension()]}
-            editable={false}
-            height="300px"
+      <div className="flex flex-col gap-6 md:flex-row">
+        <div className="w-full rounded-lg bg-gray-800 p-6 shadow-md md:w-1/2">
+          <h2 className="mb-4 text-xl font-semibold">문제 내용</h2>
+          <div
+            className="prose prose-invert max-w-none text-gray-300"
+            dangerouslySetInnerHTML={{ __html: content }}
           />
+        </div>
+
+        <div className="w-full rounded-lg bg-gray-800 p-6 shadow-md md:w-1/2">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-xl font-semibold">내 풀이</h2>
+            <select
+              value={language}
+              onChange={handleLanguageChange}
+              className="rounded-md bg-gray-700 px-3 py-1 text-sm text-gray-200">
+              <option value="javascript">JavaScript</option>
+              <option value="java">Java</option>
+              <option value="c">C</option>
+              <option value="cpp">C++</option>
+              <option value="python">Python</option>
+            </select>
+          </div>
+          <div className="overflow-hidden rounded-md border border-gray-700">
+            <CodeMirror
+              value={userSolution}
+              theme={abcdef}
+              extensions={[getLanguageExtension()]}
+              editable={false}
+              height="500px"
+            />
+          </div>
         </div>
       </div>
     </div>
