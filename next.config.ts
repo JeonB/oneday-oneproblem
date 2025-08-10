@@ -19,9 +19,7 @@ const nextConfig: NextConfig = {
     }
     return config
   },
-  devIndicators: {
-    appIsrStatus: false,
-  },
+  devIndicators: false,
   output: 'standalone',
 }
 
