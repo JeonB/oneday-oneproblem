@@ -22,9 +22,15 @@ interface StoreContextType {
 const OneDayContext = createContext<StoreContextType | undefined>(undefined)
 
 export const OneDayProvider = ({ children }: { children: React.ReactNode }) => {
-  const authStoreRef = useRef<StoreApi<AuthState>>()
-  const signInAndUpStoreRef = useRef<StoreApi<SignInAndUpState>>()
-  const problemStoreRef = useRef<StoreApi<ProblemState>>()
+  const authStoreRef = useRef<StoreApi<AuthState>>(
+    createAuthStore(initAuthStore()),
+  )
+  const signInAndUpStoreRef = useRef<StoreApi<SignInAndUpState>>(
+    createSignInAndUpStore(initSignUpStore()),
+  )
+  const problemStoreRef = useRef<StoreApi<ProblemState>>(
+    createProblemStore(initProblemStore()),
+  )
 
   if (!authStoreRef.current)
     authStoreRef.current = createAuthStore(initAuthStore())

@@ -5,8 +5,8 @@ import './globals.css'
 import { OneDayProvider } from '@/components/context/StoreContext'
 import Header from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
-import NextAuthSessionProvider from './providers/SessionProvider'
-import SessionLoader from './providers/SessionLoader'
+import NextAuthSessionProvider from './(auth)/providers/SessionProvider'
+import SessionLoader from './(auth)/providers/SessionLoader'
 import { Toaster } from '@/components/ui/toaster'
 
 const geistSans = localFont({
