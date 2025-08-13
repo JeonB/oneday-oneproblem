@@ -3,6 +3,8 @@ import { connectDB } from '@/app/lib/connecter'
 import User, { UserProps } from '@/app/lib/models/User'
 import Problem from '@/app/lib/models/Problem'
 import dayjs from 'dayjs'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/app/lib/authoptions'
 
 // 유저 정보 업데이트 함수
 async function updateUserStats(
@@ -113,7 +115,19 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   try {
     await connectDB()
-    const { userId } = await req.json()
+
+    const userId = req.nextUrl.searchParams.get('userId')
+    if (!userId) {
+      return NextResponse.json(
+        { message: 'userId is required' },
+        { status: 400 },
+      )
+    }
+
+    const session = await getServerSession(authOptions)
+    if (!session || session.user?.id !== userId) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
+    }
 
     const problems = await Problem.find({ userId })
 

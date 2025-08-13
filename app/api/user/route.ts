@@ -6,17 +6,27 @@ import { promises as fs } from 'fs'
 import path from 'path'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/lib/authoptions'
+import { z } from 'zod'
 
 // 이미지 업로드 경로 설정
 const uploadDir = path.join(process.cwd(), 'public/upload')
 
+const MAX_UPLOAD_BYTES = 5 * 1024 * 1024 // 5MB
+const ALLOWED_MIME = new Set(['image/png', 'image/jpeg', 'image/webp'])
+
+const sanitizeFileName = (name: string) => name.replace(/[^a-zA-Z0-9_.-]/g, '_')
+
 export async function POST(req: NextRequest) {
   await connectDB()
   const formData = await req.formData()
-  const email = formData.get('email') as string
-  const name = formData.get('name') as string
-  const password = formData.get('password') as string
+  const email = (formData.get('email') as string) || ''
+  const name = (formData.get('name') as string) || ''
+  const password = (formData.get('password') as string) || ''
   const profileImage = formData.get('profileImage') as File | null
+
+  if (!email || !name || !password) {
+    return NextResponse.json({ message: 'Invalid payload' }, { status: 400 })
+  }
 
   const userExists = await User.findOne({ email })
   if (userExists) {
@@ -30,7 +40,17 @@ export async function POST(req: NextRequest) {
 
   let imagePath = null
   if (profileImage) {
-    const fileName = `${email}_${Date.now()}_${profileImage.name}`
+    if (!ALLOWED_MIME.has(profileImage.type)) {
+      return NextResponse.json(
+        { message: 'Unsupported file type' },
+        { status: 400 },
+      )
+    }
+    if (profileImage.size > MAX_UPLOAD_BYTES) {
+      return NextResponse.json({ message: 'File too large' }, { status: 413 })
+    }
+    const safeName = sanitizeFileName(profileImage.name)
+    const fileName = `${email}_${Date.now()}_${safeName}`
     const filePath = path.join(uploadDir, fileName)
 
     // 업로드 폴더 생성 (존재하지 않으면)
@@ -40,7 +60,7 @@ export async function POST(req: NextRequest) {
     const buffer = Buffer.from(await profileImage.arrayBuffer())
     await fs.writeFile(filePath, buffer)
 
-    imagePath = `/upload/${fileName}` // 이미지 URL 경로
+    imagePath = `/upload/${fileName}`
   }
   const newUser = {
     name,
@@ -59,8 +79,14 @@ export async function OPTIONS() {
 
 export async function GET(req: NextRequest) {
   await connectDB()
-  const users = await User.find({}).lean()
-  return NextResponse.json(users, { status: 200 })
+  const session = await getServerSession(authOptions)
+  if (!session)
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
+  // 최소한의 데이터만 반환 (자기 자신)
+  const me = await User.findOne({ email: session.user?.email })
+    .select('name email profileImage streak totalProblemsSolved lastSolvedDate')
+    .lean()
+  return NextResponse.json(me, { status: 200 })
 }
 
 export async function PUT(req: NextRequest) {
@@ -74,13 +100,28 @@ export async function PUT(req: NextRequest) {
     const password = formData.get('password') as string
     const profileImage = formData.get('profileImage') as File | null
 
+    const session = await getServerSession(authOptions)
+    if (!session || session.user?.email !== email) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
+    }
+
     // 비밀번호 암호화
     const hashedPassword = await bcrypt.hash(password, 10)
 
     // 프로필 이미지 저장
     let imagePath = null
     if (profileImage) {
-      const fileName = `${email}_${Date.now()}_${profileImage.name}`
+      if (!ALLOWED_MIME.has(profileImage.type)) {
+        return NextResponse.json(
+          { message: 'Unsupported file type' },
+          { status: 400 },
+        )
+      }
+      if (profileImage.size > MAX_UPLOAD_BYTES) {
+        return NextResponse.json({ message: 'File too large' }, { status: 413 })
+      }
+      const safeName = sanitizeFileName(profileImage.name)
+      const fileName = `${email}_${Date.now()}_${safeName}`
       const filePath = path.join(uploadDir, fileName)
 
       // 업로드 폴더 생성 (존재하지 않으면)
@@ -90,7 +131,7 @@ export async function PUT(req: NextRequest) {
       const buffer = Buffer.from(await profileImage.arrayBuffer())
       await fs.writeFile(filePath, buffer)
 
-      imagePath = `/upload/${fileName}` // 이미지 URL 경로
+      imagePath = `/upload/${fileName}`
     }
 
     // 사용자 데이터 업데이트
@@ -107,10 +148,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ message: 'User not found' }, { status: 404 })
     }
 
-    const session = await getServerSession(authOptions)
-    if (session && session.user && session.user.email === email) {
-      session.user.name = name
-    }
+    // 클라이언트에서 useSession().update(...)로 동기화 권장
 
     return NextResponse.json(user, { status: 200 })
   } catch (error) {

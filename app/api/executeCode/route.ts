@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+
+export const runtime = 'edge'
+export const dynamic = 'force-dynamic'
 import { AiGeneratedContent } from '@/components/context/Store'
 
 // JSON 문자열 유효성 검사 함수
@@ -42,27 +46,106 @@ const deepEqual = (a: any, b: any): boolean => {
   return a === b
 }
 
-export async function POST(req: NextRequest) {
-  const { problemData } = await req.json()
-  const { userSolution, inputOutput } = problemData
+const MAX_CODE_LENGTH = 10000
+const MAX_TESTS = 50
+const FORBIDDEN_TOKENS = [
+  'process',
+  'require',
+  'global',
+  'globalThis',
+  'window',
+  'eval',
+  'Function(',
+  'WebAssembly',
+  'import(',
+  'XMLHttpRequest',
+  'navigator',
+  'fetch',
+]
 
+const AiGeneratedContentSchema = z.object({
+  input: z.union([z.array(z.string()), z.string()]),
+  output: z.union([z.string(), z.array(z.string())]).optional(),
+})
+
+const BodySchema = z.object({
+  problemData: z.object({
+    userSolution: z.string().min(1).max(MAX_CODE_LENGTH),
+    inputOutput: z.array(AiGeneratedContentSchema).max(MAX_TESTS),
+  }),
+})
+
+const hasForbiddenTokens = (code: string): string | null => {
+  const lower = code.toLowerCase()
+  for (const token of FORBIDDEN_TOKENS) {
+    if (lower.includes(token.toLowerCase())) return token
+  }
+  return null
+}
+
+const ensureSolutionDefined = (code: string) => {
+  const hasNamedFn = /function\s+solution\s*\(/.test(code)
+  const hasAssigned =
+    /const\s+solution\s*=\s*/.test(code) ||
+    /let\s+solution\s*=\s*/.test(code) ||
+    /var\s+solution\s*=\s*/.test(code)
+  if (!hasNamedFn && !hasAssigned) {
+    throw new Error('A function named "solution" must be defined in your code.')
+  }
+}
+
+export async function POST(req: NextRequest) {
   try {
+    const parsed = BodySchema.safeParse(await req.json())
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: 'Invalid request body' },
+        { status: 400 },
+      )
+    }
+
+    const { userSolution, inputOutput } = parsed.data.problemData
+
+    const forbidden = hasForbiddenTokens(userSolution)
+    if (forbidden) {
+      return NextResponse.json(
+        { error: `Usage of "${forbidden}" is not allowed.` },
+        { status: 400 },
+      )
+    }
+
+    ensureSolutionDefined(userSolution)
+
     // AI가 제공한 테스트 케이스 파싱
     const testCases = parseTestCases(inputOutput)
 
     // 사용자 코드를 실행 가능한 함수로 변환
     const wrappedCode = `
+    "use strict";
     ${userSolution}
     return solution;
   `
     const solutionFunction = new Function(wrappedCode)
+    const solution = solutionFunction()
 
-    const solution = solutionFunction() // 반환된 solution 함수
     if (typeof solution !== 'function') {
       throw new Error('The provided solution is not a valid function.')
     }
-    // 테스트 케이스 검증
-    const results = testCases.map(({ input, output }) => {
+
+    const results = [] as Array<{
+      input: any
+      output: any
+      result: any
+      passed: boolean
+      logs: string[]
+      error?: string
+    }>
+
+    let totalMs = 0
+    const MAX_TOTAL_MS = 2000
+
+    for (const { input, output } of testCases) {
+      const start = Date.now()
       try {
         const testCode = `
         const capturedLogs = [];
@@ -80,25 +163,37 @@ export async function POST(req: NextRequest) {
       `
         const testFunction = new Function('solution', testCode)
         const { result, capturedLogs } = testFunction(solution)
-
-        return {
+        results.push({
           input,
           output,
           result,
           passed: deepEqual(result, output),
           logs: capturedLogs,
-        }
+        })
       } catch (error) {
-        return {
+        results.push({
           input,
           output,
           result: null,
           passed: false,
           logs: [],
           error: (error as Error).message,
+        })
+      } finally {
+        totalMs += Date.now() - start
+        if (totalMs > MAX_TOTAL_MS) {
+          results.push({
+            input: [],
+            output: null,
+            result: null,
+            passed: false,
+            logs: [],
+            error: 'Execution time limit exceeded',
+          })
+          break
         }
       }
-    })
+    }
 
     return NextResponse.json({ results }, { status: 200 })
   } catch (error) {
