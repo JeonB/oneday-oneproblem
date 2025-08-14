@@ -2,6 +2,17 @@ import Algorithms, { Algorithm } from '@/app/lib/models/Algorithms'
 import { connectDB } from '@/app/lib/connecter'
 import { startSession } from 'mongoose'
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/app/lib/authoptions'
+
+const AlgorithmSchema = z.object({
+  name: z.string().min(1),
+  topic: z.string().min(1),
+  img: z.string().url().optional().or(z.literal('')).optional(),
+})
+
+const AlgorithmsArraySchema = z.array(AlgorithmSchema).min(1)
 
 export async function GET(req: NextRequest) {
   await connectDB()
@@ -24,7 +35,16 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   await connectDB()
-  const { testalgorithms } = await req.json()
+  const userSession = await getServerSession(authOptions)
+  if (!userSession)
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const body = await req.json()
+  const parsed = AlgorithmsArraySchema.safeParse(body?.testalgorithms)
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Invalid payload' }, { status: 400 })
+  }
+  const testalgorithms = parsed.data
 
   const session = await startSession()
   session.startTransaction()
@@ -66,7 +86,15 @@ export async function POST(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   await connectDB()
-  const { name, topic, img } = await req.json()
+  const session = await getServerSession(authOptions)
+  if (!session)
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const parsed = AlgorithmSchema.safeParse(await req.json())
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'Invalid payload' }, { status: 400 })
+  }
+  const { name, topic, img } = parsed.data
 
   try {
     const algorithm: Algorithm | null = await Algorithms.findOne({ name })

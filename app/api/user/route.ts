@@ -7,6 +7,7 @@ import path from 'path'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/lib/authoptions'
 import { z } from 'zod'
+import { getClientIdFromRequest, rateLimit } from '@/app/lib/rateLimit'
 
 // 이미지 업로드 경로 설정
 const uploadDir = path.join(process.cwd(), 'public/upload')
@@ -17,6 +18,13 @@ const ALLOWED_MIME = new Set(['image/png', 'image/jpeg', 'image/webp'])
 const sanitizeFileName = (name: string) => name.replace(/[^a-zA-Z0-9_.-]/g, '_')
 
 export async function POST(req: NextRequest) {
+  const id = getClientIdFromRequest(req)
+  const rl = rateLimit({ id, capacity: 5, refillPerSec: 1 })
+  if (!rl.allowed)
+    return NextResponse.json(
+      { message: 'Too Many Requests' },
+      { status: 429, headers: { 'Retry-After': String(rl.retryAfter) } },
+    )
   await connectDB()
   const formData = await req.formData()
   const email = (formData.get('email') as string) || ''
@@ -91,6 +99,13 @@ export async function GET(req: NextRequest) {
 
 export async function PUT(req: NextRequest) {
   try {
+    const id = getClientIdFromRequest(req)
+    const rl = rateLimit({ id, capacity: 10, refillPerSec: 2 })
+    if (!rl.allowed)
+      return NextResponse.json(
+        { message: 'Too Many Requests' },
+        { status: 429, headers: { 'Retry-After': String(rl.retryAfter) } },
+      )
     await connectDB()
 
     // 요청 데이터 처리

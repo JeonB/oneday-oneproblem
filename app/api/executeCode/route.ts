@@ -117,7 +117,12 @@ export async function POST(req: NextRequest) {
     ensureSolutionDefined(userSolution)
 
     // AI가 제공한 테스트 케이스 파싱
-    const testCases = parseTestCases(inputOutput)
+    const testCases = parseTestCases(
+      inputOutput as unknown as {
+        input: string | string[]
+        output: string | string[]
+      }[],
+    )
 
     // 사용자 코드를 실행 가능한 함수로 변환
     const wrappedCode = `

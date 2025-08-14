@@ -5,11 +5,13 @@ import Problem from '@/app/lib/models/Problem'
 import dayjs from 'dayjs'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/lib/authoptions'
+import crypto from 'crypto'
+import { getClientIdFromRequest, rateLimit } from '@/app/lib/rateLimit'
 
 // 유저 정보 업데이트 함수
 async function updateUserStats(
   email: string,
-  today: string,
+  today: Date,
 ): Promise<{ streak: number; totalProblemsSolved: number }> {
   const userStats = (await User.findOne({ email })) as UserProps | null
 
@@ -50,7 +52,12 @@ async function handleProblemUpdate(
   topic: string,
   difficulty: string,
 ): Promise<void> {
-  const existingProblem = await Problem.findOne({ userId, content })
+  const contentHash = crypto
+    .createHash('sha256')
+    .update(content, 'utf8')
+    .digest('hex')
+
+  const existingProblem = await Problem.findOne({ userId, contentHash })
 
   if (existingProblem) {
     // 기존 문제 업데이트
@@ -65,6 +72,7 @@ async function handleProblemUpdate(
       topic,
       difficulty,
       content,
+      contentHash,
       userSolution,
     })
     await newProblem.save()
@@ -74,11 +82,18 @@ async function handleProblemUpdate(
 // POST: 문제 풀이 처리 및 유저 업데이트
 export async function POST(req: NextRequest) {
   try {
+    const id = getClientIdFromRequest(req)
+    const rl = rateLimit({ id, capacity: 20, refillPerSec: 5 })
+    if (!rl.allowed)
+      return NextResponse.json(
+        { message: 'Too Many Requests' },
+        { status: 429, headers: { 'Retry-After': String(rl.retryAfter) } },
+      )
     await connectDB()
     const { title, userId, topic, difficulty, content, userSolution, email } =
       await req.json()
 
-    const today = dayjs().startOf('day').toISOString()
+    const today = dayjs().startOf('day').toDate()
 
     const userStats = await User.findOne({ email })
     if (!userStats) {
