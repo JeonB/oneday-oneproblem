@@ -24,6 +24,7 @@ const ProblemSchema: Schema = new mongoose.Schema({
 })
 
 ProblemSchema.index({ userId: 1, contentHash: 1 }, { unique: true })
+ProblemSchema.index({ userId: 1, createdAt: -1 })
 
 export default mongoose.models.Problem ||
   mongoose.model<ProblemProps>('Problem', ProblemSchema)

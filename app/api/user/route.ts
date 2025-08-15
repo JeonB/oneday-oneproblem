@@ -32,9 +32,14 @@ export async function POST(req: NextRequest) {
   const password = (formData.get('password') as string) || ''
   const profileImage = formData.get('profileImage') as File | null
 
-  if (!email || !name || !password) {
+  const BodySchema = z.object({
+    email: z.string().email(),
+    name: z.string().min(1),
+    password: z.string().min(6),
+  })
+  const parsed = BodySchema.safeParse({ email, name, password })
+  if (!parsed.success)
     return NextResponse.json({ message: 'Invalid payload' }, { status: 400 })
-  }
 
   const userExists = await User.findOne({ email })
   if (userExists) {
@@ -119,6 +124,15 @@ export async function PUT(req: NextRequest) {
     if (!session || session.user?.email !== email) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
     }
+
+    const BodySchema = z.object({
+      email: z.string().email(),
+      name: z.string().min(1),
+      password: z.string().min(6),
+    })
+    const parsed = BodySchema.safeParse({ email, name, password })
+    if (!parsed.success)
+      return NextResponse.json({ message: 'Invalid payload' }, { status: 400 })
 
     // 비밀번호 암호화
     const hashedPassword = await bcrypt.hash(password, 10)

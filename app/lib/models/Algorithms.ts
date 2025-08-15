@@ -7,7 +7,7 @@ export interface Algorithm {
 }
 
 const Algorithms: Schema = new Schema({
-  name: { type: String, required: true, index: true },
+  name: { type: String, required: true, index: true, unique: true },
   topic: { type: String, required: true },
   img: { type: String, required: false },
 })

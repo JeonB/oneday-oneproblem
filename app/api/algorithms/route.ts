@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/lib/authoptions'
+import { getClientIdFromRequest, rateLimit } from '@/app/lib/rateLimit'
 
 const AlgorithmSchema = z.object({
   name: z.string().min(1),
@@ -70,7 +71,14 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    await Algorithms.insertMany(newAlgorithms, { session })
+    try {
+      await Algorithms.insertMany(newAlgorithms, { session, ordered: false })
+    } catch (e: any) {
+      // ignore duplicate key errors on unordered inserts
+      if (e?.writeErrors?.every((we: any) => we?.code === 11000) !== true) {
+        throw e
+      }
+    }
     await session.commitTransaction()
     session.endSession()
     return NextResponse.json(newAlgorithms, { status: 201 })
@@ -117,6 +125,17 @@ export async function PUT(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
   await connectDB()
+  const id = getClientIdFromRequest(req)
+  const rl = rateLimit({ id, capacity: 5, refillPerSec: 1 })
+  if (!rl.allowed)
+    return NextResponse.json(
+      { error: 'Too Many Requests' },
+      { status: 429, headers: { 'Retry-After': String(rl.retryAfter) } },
+    )
+
+  const session = await getServerSession(authOptions)
+  if (!session)
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   try {
     await Algorithms.deleteMany({})

@@ -7,6 +7,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/app/lib/authoptions'
 import crypto from 'crypto'
 import { getClientIdFromRequest, rateLimit } from '@/app/lib/rateLimit'
+import { z } from 'zod'
 
 // 유저 정보 업데이트 함수
 async function updateUserStats(
@@ -90,8 +91,31 @@ export async function POST(req: NextRequest) {
         { status: 429, headers: { 'Retry-After': String(rl.retryAfter) } },
       )
     await connectDB()
+    const BodySchema = z.object({
+      title: z.string().min(1),
+      userId: z.string().min(1),
+      topic: z.string().min(1),
+      difficulty: z.string().min(1),
+      content: z.string().min(1),
+      userSolution: z.string().min(1),
+      email: z.string().email(),
+    })
+
+    const parsed = BodySchema.safeParse(await req.json())
+    if (!parsed.success)
+      return NextResponse.json({ message: 'Invalid payload' }, { status: 400 })
+
     const { title, userId, topic, difficulty, content, userSolution, email } =
-      await req.json()
+      parsed.data
+
+    const session = await getServerSession(authOptions)
+    if (
+      !session ||
+      session.user?.id !== userId ||
+      session.user?.email !== email
+    ) {
+      return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
+    }
 
     const today = dayjs().startOf('day').toDate()
 

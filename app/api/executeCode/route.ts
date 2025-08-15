@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
+import { getClientIdFromRequest, rateLimit } from '@/app/lib/rateLimit'
 
 export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
@@ -96,6 +97,13 @@ const ensureSolutionDefined = (code: string) => {
 
 export async function POST(req: NextRequest) {
   try {
+    const id = getClientIdFromRequest(req)
+    const rl = rateLimit({ id, capacity: 30, refillPerSec: 10 })
+    if (!rl.allowed)
+      return NextResponse.json(
+        { error: 'Too Many Requests' },
+        { status: 429, headers: { 'Retry-After': String(rl.retryAfter) } },
+      )
     const parsed = BodySchema.safeParse(await req.json())
     if (!parsed.success) {
       return NextResponse.json(
