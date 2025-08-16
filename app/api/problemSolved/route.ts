@@ -150,27 +150,65 @@ export async function POST(req: NextRequest) {
   }
 }
 
+const GetQuerySchema = z.object({
+  userId: z.string().min(1),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+  sort: z
+    .enum(['createdAt', '-createdAt', 'title', '-title'])
+    .default('-createdAt'),
+})
+
 // GET: 유저의 문제 목록 가져오기
 export async function GET(req: NextRequest) {
   try {
     await connectDB()
 
-    const userId = req.nextUrl.searchParams.get('userId')
-    if (!userId) {
+    const { searchParams } = req.nextUrl
+    const parsed = GetQuerySchema.safeParse({
+      userId: searchParams.get('userId'),
+      page: searchParams.get('page'),
+      limit: searchParams.get('limit'),
+      sort: searchParams.get('sort'),
+    })
+
+    if (!parsed.success) {
       return NextResponse.json(
-        { message: 'userId is required' },
+        { message: 'Invalid query parameters' },
         { status: 400 },
       )
     }
+
+    const { userId, page, limit, sort } = parsed.data
 
     const session = await getServerSession(authOptions)
     if (!session || session.user?.id !== userId) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
     }
 
-    const problems = await Problem.find({ userId })
+    const skip = (page - 1) * limit
+    const sortObj = sort.startsWith('-')
+      ? { [sort.slice(1)]: -1 as const }
+      : { [sort]: 1 as const }
 
-    return NextResponse.json(problems)
+    const [problems, total] = await Promise.all([
+      Problem.find({ userId }).sort(sortObj).skip(skip).limit(limit).lean(),
+      Problem.countDocuments({ userId }),
+    ])
+
+    const totalPages = Math.ceil(total / limit)
+
+    return NextResponse.json({
+      problems,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      },
+    })
   } catch (error) {
     console.error(error)
     return NextResponse.json(

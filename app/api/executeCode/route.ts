@@ -1,10 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { getClientIdFromRequest, rateLimit } from '@/app/lib/rateLimit'
+import { logger, createRequestContext } from '@/lib/logger'
 
 export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
-import { AiGeneratedContent } from '@/components/context/Store'
+
+// Note: This API now serves as a fallback for Web Worker execution
+// The primary code execution should happen client-side using the Web Worker
+
+const AiGeneratedContentSchema = z.object({
+  input: z.union([z.array(z.string()), z.string()]),
+  output: z.union([z.string(), z.array(z.string())]).optional(),
+})
+
+const BodySchema = z.object({
+  problemData: z.object({
+    userSolution: z.string().min(1).max(10000),
+    inputOutput: z.array(AiGeneratedContentSchema).max(50),
+  }),
+})
 
 // JSON 문자열 유효성 검사 함수
 const isValidJson = (str: string) => {
@@ -17,7 +32,7 @@ const isValidJson = (str: string) => {
 }
 
 // AI가 생성한 테스트 케이스 파싱
-const parseTestCases = (aiGeneratedContent: AiGeneratedContent[]) => {
+const parseTestCases = (aiGeneratedContent: any[]) => {
   return aiGeneratedContent.slice(1).map(({ input, output }) => {
     if (!input || !output) {
       throw new Error(
@@ -47,8 +62,6 @@ const deepEqual = (a: any, b: any): boolean => {
   return a === b
 }
 
-const MAX_CODE_LENGTH = 10000
-const MAX_TESTS = 50
 const FORBIDDEN_TOKENS = [
   'process',
   'require',
@@ -63,18 +76,6 @@ const FORBIDDEN_TOKENS = [
   'navigator',
   'fetch',
 ]
-
-const AiGeneratedContentSchema = z.object({
-  input: z.union([z.array(z.string()), z.string()]),
-  output: z.union([z.string(), z.array(z.string())]).optional(),
-})
-
-const BodySchema = z.object({
-  problemData: z.object({
-    userSolution: z.string().min(1).max(MAX_CODE_LENGTH),
-    inputOutput: z.array(AiGeneratedContentSchema).max(MAX_TESTS),
-  }),
-})
 
 const hasForbiddenTokens = (code: string): string | null => {
   const lower = code.toLowerCase()
@@ -96,16 +97,26 @@ const ensureSolutionDefined = (code: string) => {
 }
 
 export async function POST(req: NextRequest) {
+  const context = createRequestContext(req)
+  logger.info('Code execution request received', context)
+
   try {
     const id = getClientIdFromRequest(req)
     const rl = rateLimit({ id, capacity: 30, refillPerSec: 10 })
-    if (!rl.allowed)
+    if (!rl.allowed) {
+      logger.warn('Rate limit exceeded for code execution', {
+        ...context,
+        clientId: id,
+      })
       return NextResponse.json(
         { error: 'Too Many Requests' },
         { status: 429, headers: { 'Retry-After': String(rl.retryAfter) } },
       )
+    }
+
     const parsed = BodySchema.safeParse(await req.json())
     if (!parsed.success) {
+      logger.warn('Invalid request body for code execution', context)
       return NextResponse.json(
         { error: 'Invalid request body' },
         { status: 400 },
@@ -116,6 +127,10 @@ export async function POST(req: NextRequest) {
 
     const forbidden = hasForbiddenTokens(userSolution)
     if (forbidden) {
+      logger.warn('Forbidden token detected in code', {
+        ...context,
+        token: forbidden,
+      })
       return NextResponse.json(
         { error: `Usage of "${forbidden}" is not allowed.` },
         { status: 400 },
@@ -159,6 +174,8 @@ export async function POST(req: NextRequest) {
 
     for (const { input, output } of testCases) {
       const start = Date.now()
+      let executionTime = 0
+
       try {
         const testCode = `
         const capturedLogs = [];
@@ -193,23 +210,33 @@ export async function POST(req: NextRequest) {
           error: (error as Error).message,
         })
       } finally {
-        totalMs += Date.now() - start
-        if (totalMs > MAX_TOTAL_MS) {
-          results.push({
-            input: [],
-            output: null,
-            result: null,
-            passed: false,
-            logs: [],
-            error: 'Execution time limit exceeded',
-          })
-          break
-        }
+        executionTime = Date.now() - start
+        totalMs += executionTime
+      }
+
+      // Check time limit after finally block
+      if (totalMs > MAX_TOTAL_MS) {
+        results.push({
+          input: [],
+          output: null,
+          result: null,
+          passed: false,
+          logs: [],
+          error: 'Execution time limit exceeded',
+        })
+        break
       }
     }
 
+    logger.info('Code execution completed successfully', {
+      ...context,
+      testCasesCount: testCases.length,
+      executionTime: totalMs,
+    })
+
     return NextResponse.json({ results }, { status: 200 })
   } catch (error) {
+    logger.error('Code execution failed', error as Error, context)
     return NextResponse.json(
       { error: (error as Error).message },
       { status: 500 },
