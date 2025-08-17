@@ -8,6 +8,7 @@ import { authOptions } from '@/app/lib/authoptions'
 import crypto from 'crypto'
 import { getClientIdFromRequest, rateLimit } from '@/app/lib/rateLimit'
 import { z } from 'zod'
+import { logger, createRequestContext } from '@/lib/logger'
 
 // 유저 정보 업데이트 함수
 async function updateUserStats(
@@ -82,14 +83,22 @@ async function handleProblemUpdate(
 
 // POST: 문제 풀이 처리 및 유저 업데이트
 export async function POST(req: NextRequest) {
+  const context = createRequestContext(req)
+  logger.info('Problem solved submission received', context)
+
   try {
     const id = getClientIdFromRequest(req)
     const rl = rateLimit({ id, capacity: 20, refillPerSec: 5 })
-    if (!rl.allowed)
+    if (!rl.allowed) {
+      logger.warn('Rate limit exceeded for problem solved submission', {
+        ...context,
+        clientId: id,
+      })
       return NextResponse.json(
         { message: 'Too Many Requests' },
         { status: 429, headers: { 'Retry-After': String(rl.retryAfter) } },
       )
+    }
     await connectDB()
     const BodySchema = z.object({
       title: z.string().min(1),
@@ -102,8 +111,10 @@ export async function POST(req: NextRequest) {
     })
 
     const parsed = BodySchema.safeParse(await req.json())
-    if (!parsed.success)
+    if (!parsed.success) {
+      logger.warn('Invalid problem solved payload', context)
       return NextResponse.json({ message: 'Invalid payload' }, { status: 400 })
+    }
 
     const { title, userId, topic, difficulty, content, userSolution, email } =
       parsed.data
@@ -114,6 +125,11 @@ export async function POST(req: NextRequest) {
       session.user?.id !== userId ||
       session.user?.email !== email
     ) {
+      logger.warn('Unauthorized problem solved submission', {
+        ...context,
+        userId,
+        email,
+      })
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
     }
 
@@ -121,6 +137,14 @@ export async function POST(req: NextRequest) {
 
     const userStats = await User.findOne({ email })
     if (!userStats) {
+      logger.error(
+        'User not found during problem solved submission',
+        undefined,
+        {
+          ...context,
+          email,
+        },
+      )
       return NextResponse.json(
         { message: '사용자를 찾을 수 없습니다.' },
         { status: 404 },
@@ -140,9 +164,22 @@ export async function POST(req: NextRequest) {
     // 유저 정보 업데이트
     const updatedStats = await updateUserStats(email, today)
 
+    logger.info('Problem solved successfully', {
+      ...context,
+      userId,
+      topic,
+      difficulty,
+      newStreak: updatedStats.streak,
+      totalProblems: updatedStats.totalProblemsSolved,
+    })
+
     return NextResponse.json(updatedStats)
   } catch (error) {
-    console.error(error)
+    logger.error(
+      'Error processing problem solved submission',
+      error as Error,
+      context,
+    )
     return NextResponse.json(
       { message: '서버 오류가 발생했습니다. 다시 시도해주세요.' },
       { status: 500 },
@@ -161,6 +198,9 @@ const GetQuerySchema = z.object({
 
 // GET: 유저의 문제 목록 가져오기
 export async function GET(req: NextRequest) {
+  const context = createRequestContext(req)
+  logger.info('Problem list request received', context)
+
   try {
     await connectDB()
 
@@ -173,6 +213,7 @@ export async function GET(req: NextRequest) {
     })
 
     if (!parsed.success) {
+      logger.warn('Invalid query parameters for problem list', context)
       return NextResponse.json(
         { message: 'Invalid query parameters' },
         { status: 400 },
@@ -183,6 +224,7 @@ export async function GET(req: NextRequest) {
 
     const session = await getServerSession(authOptions)
     if (!session || session.user?.id !== userId) {
+      logger.warn('Unauthorized problem list request', { ...context, userId })
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
     }
 
@@ -198,6 +240,15 @@ export async function GET(req: NextRequest) {
 
     const totalPages = Math.ceil(total / limit)
 
+    logger.info('Problem list retrieved successfully', {
+      ...context,
+      userId,
+      problemsCount: problems.length,
+      total,
+      page,
+      totalPages,
+    })
+
     return NextResponse.json({
       problems,
       pagination: {
@@ -210,7 +261,7 @@ export async function GET(req: NextRequest) {
       },
     })
   } catch (error) {
-    console.error(error)
+    logger.error('Error retrieving problem list', error as Error, context)
     return NextResponse.json(
       { message: '서버 오류가 발생했습니다. 다시 시도해주세요.' },
       { status: 500 },

@@ -2,6 +2,10 @@ interface LogContext {
   requestId?: string
   userId?: string
   endpoint?: string
+  email?: string
+  clientId?: string
+  fileType?: string
+  fileSize?: number
   [key: string]: any
 }
 
