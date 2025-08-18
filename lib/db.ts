@@ -33,6 +33,18 @@ export const userQueries = {
     return withDB(() => User.findOne({ email }).lean())
   },
 
+  // Create new user
+  async createUser(userData: any) {
+    return withDB(() => User.create(userData))
+  },
+
+  // Update user profile
+  async updateUser(email: string, updates: any) {
+    return withDB(() =>
+      User.findOneAndUpdate({ email }, { $set: updates }, { new: true }).lean(),
+    )
+  },
+
   // Update user stats efficiently
   async updateStats(email: string, updates: any) {
     return withDB(() =>
@@ -100,6 +112,16 @@ export const algorithmQueries = {
   // Find algorithms by names
   async findByNames(names: string[]) {
     return withDB(() => Algorithms.find({ name: { $in: names } }).lean())
+  },
+
+  // Update algorithm by name
+  async updateAlgorithm(name: string, updates: any) {
+    return withDB(() => Algorithms.updateOne({ name }, { $set: updates }))
+  },
+
+  // Delete all algorithms
+  async deleteAll() {
+    return withDB(() => Algorithms.deleteMany({}))
   },
 
   // Bulk insert algorithms with duplicate handling

@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { connectDB } from '@/app/lib/connecter'
 import bcrypt from 'bcryptjs'
-import User from '@/app/lib/models/User'
 import { promises as fs } from 'fs'
 import path from 'path'
 import { getServerSession } from 'next-auth'
@@ -9,6 +7,7 @@ import { authOptions } from '@/app/lib/authoptions'
 import { z } from 'zod'
 import { getClientIdFromRequest, rateLimit } from '@/app/lib/rateLimit'
 import { logger, createRequestContext } from '@/lib/logger'
+import { userQueries, withPerformanceMonitoring } from '@/lib/db'
 
 // 이미지 업로드 경로 설정
 const uploadDir = path.join(process.cwd(), 'public/upload')
@@ -35,7 +34,6 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  await connectDB()
   const formData = await req.formData()
   const email = (formData.get('email') as string) || ''
   const name = (formData.get('name') as string) || ''
@@ -53,62 +51,77 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: 'Invalid payload' }, { status: 400 })
   }
 
-  const userExists = await User.findOne({ email })
-  if (userExists) {
-    logger.warn('User already exists during registration', {
-      ...context,
-      email,
-    })
-    return NextResponse.json(
-      { message: 'User already exists' },
-      { status: 400 },
+  try {
+    const userExists = await withPerformanceMonitoring('checkUserExists', () =>
+      userQueries.findByEmailWithPassword(email),
     )
-  }
 
-  const hashedPassword = await bcrypt.hash(password, 10)
-
-  let imagePath = null
-  if (profileImage) {
-    if (!ALLOWED_MIME.has(profileImage.type)) {
-      logger.warn('Unsupported file type in user registration', {
+    if (userExists) {
+      logger.warn('User already exists during registration', {
         ...context,
-        fileType: profileImage.type,
+        email,
       })
       return NextResponse.json(
-        { message: 'Unsupported file type' },
+        { message: 'User already exists' },
         { status: 400 },
       )
     }
-    if (profileImage.size > MAX_UPLOAD_BYTES) {
-      logger.warn('File too large in user registration', {
-        ...context,
-        fileSize: profileImage.size,
-      })
-      return NextResponse.json({ message: 'File too large' }, { status: 413 })
+
+    const hashedPassword = await bcrypt.hash(password, 10)
+
+    let imagePath = null
+    if (profileImage) {
+      if (!ALLOWED_MIME.has(profileImage.type)) {
+        logger.warn('Unsupported file type in user registration', {
+          ...context,
+          fileType: profileImage.type,
+        })
+        return NextResponse.json(
+          { message: 'Unsupported file type' },
+          { status: 400 },
+        )
+      }
+      if (profileImage.size > MAX_UPLOAD_BYTES) {
+        logger.warn('File too large in user registration', {
+          ...context,
+          fileSize: profileImage.size,
+        })
+        return NextResponse.json({ message: 'File too large' }, { status: 413 })
+      }
+      const safeName = sanitizeFileName(profileImage.name)
+      const fileName = `${email}_${Date.now()}_${safeName}`
+      const filePath = path.join(uploadDir, fileName)
+
+      // 업로드 폴더 생성 (존재하지 않으면)
+      await fs.mkdir(uploadDir, { recursive: true })
+
+      // 파일 저장
+      const buffer = Buffer.from(await profileImage.arrayBuffer())
+      await fs.writeFile(filePath, buffer)
+
+      imagePath = `/upload/${fileName}`
     }
-    const safeName = sanitizeFileName(profileImage.name)
-    const fileName = `${email}_${Date.now()}_${safeName}`
-    const filePath = path.join(uploadDir, fileName)
 
-    // 업로드 폴더 생성 (존재하지 않으면)
-    await fs.mkdir(uploadDir, { recursive: true })
+    const newUser = {
+      name,
+      email,
+      password: hashedPassword,
+      profileImage: imagePath,
+    }
 
-    // 파일 저장
-    const buffer = Buffer.from(await profileImage.arrayBuffer())
-    await fs.writeFile(filePath, buffer)
+    await withPerformanceMonitoring('createUser', () =>
+      userQueries.createUser(newUser),
+    )
 
-    imagePath = `/upload/${fileName}`
+    logger.info('User registered successfully', { ...context, email })
+    return NextResponse.json({ status: 201 })
+  } catch (error) {
+    logger.error('Error during user registration', error as Error, context)
+    return NextResponse.json(
+      { message: 'Internal Server Error' },
+      { status: 500 },
+    )
   }
-  const newUser = {
-    name,
-    email,
-    password: hashedPassword,
-    profileImage: imagePath,
-  }
-  await User.insertMany(newUser)
-
-  logger.info('User registered successfully', { ...context, email })
-  return NextResponse.json({ status: 201 })
 }
 
 export async function OPTIONS() {
@@ -119,22 +132,37 @@ export async function GET(req: NextRequest) {
   const context = createRequestContext(req)
   logger.info('User profile request received', context)
 
-  await connectDB()
   const session = await getServerSession(authOptions)
   if (!session) {
     logger.warn('Unauthorized user profile request', context)
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
   }
-  // 최소한의 데이터만 반환 (자기 자신)
-  const me = await User.findOne({ email: session.user?.email })
-    .select('name email profileImage streak totalProblemsSolved lastSolvedDate')
-    .lean()
 
-  logger.info('User profile retrieved successfully', {
-    ...context,
-    userId: session.user?.id,
-  })
-  return NextResponse.json(me, { status: 200 })
+  try {
+    const me = await withPerformanceMonitoring('getUserProfile', () =>
+      userQueries.findByEmail(session.user?.email || ''),
+    )
+
+    if (!me) {
+      logger.error('User profile not found', undefined, {
+        ...context,
+        email: session.user?.email,
+      })
+      return NextResponse.json({ message: 'User not found' }, { status: 404 })
+    }
+
+    logger.info('User profile retrieved successfully', {
+      ...context,
+      userId: session.user?.id,
+    })
+    return NextResponse.json(me, { status: 200 })
+  } catch (error) {
+    logger.error('Error retrieving user profile', error as Error, context)
+    return NextResponse.json(
+      { message: 'Internal Server Error' },
+      { status: 500 },
+    )
+  }
 }
 
 export async function PUT(req: NextRequest) {
@@ -154,7 +182,6 @@ export async function PUT(req: NextRequest) {
         { status: 429, headers: { 'Retry-After': String(rl.retryAfter) } },
       )
     }
-    await connectDB()
 
     // 요청 데이터 처리
     const formData = await req.formData()
@@ -226,12 +253,12 @@ export async function PUT(req: NextRequest) {
       updateData.profileImage = imagePath
     }
 
-    const user = await User.findOneAndUpdate({ email }, updateData, {
-      new: true,
-    }).lean()
+    const user = await withPerformanceMonitoring('updateUserProfile', () =>
+      userQueries.updateUser(email, updateData),
+    )
 
     if (!user) {
-      logger.error('User not found during profile update', {
+      logger.error('User not found during profile update', undefined, {
         ...context,
         email,
       })
