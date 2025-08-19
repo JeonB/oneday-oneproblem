@@ -172,11 +172,21 @@ export function withPerformanceMonitoring<T>(
 ): Promise<T> {
   const start = Date.now()
 
-  return operation().finally(() => {
-    const duration = Date.now() - start
-    logger.info(`Database operation completed`, {
-      operation: operationName,
-      duration,
+  return operation()
+    .then(result => {
+      const duration = Date.now() - start
+      logger.info(`Database operation completed`, {
+        operation: operationName,
+        duration,
+      })
+      return result
     })
-  })
+    .catch(error => {
+      const duration = Date.now() - start
+      logger.error(`Database operation failed`, error, {
+        operation: operationName,
+        duration,
+      })
+      throw error
+    })
 }

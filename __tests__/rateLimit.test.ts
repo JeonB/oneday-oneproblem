@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
-import { rateLimit, getClientIdFromRequest } from '@/lib/rateLimit'
+import { rateLimit, getClientIdFromRequest } from '@/app/lib/rateLimit'
 
 describe('Rate Limiting', () => {
   beforeEach(() => {
@@ -58,7 +58,7 @@ describe('Rate Limiting', () => {
     })
 
     it('should handle different refill rates', () => {
-      const id = 'test-user'
+      const id = 'test-user-different-rates'
 
       // Use a higher refill rate
       const result1 = rateLimit({ id, capacity: 10, refillPerSec: 5 })
