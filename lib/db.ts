@@ -3,6 +3,7 @@ import User from '@/app/lib/models/User'
 import Problem from '@/app/lib/models/Problem'
 import Algorithms from '@/app/lib/models/Algorithms'
 import { logger } from './logger'
+import { withEnhancedPerformanceMonitoring } from './performance'
 
 // Database connection wrapper with error handling
 export async function withDB<T>(operation: () => Promise<T>): Promise<T> {
