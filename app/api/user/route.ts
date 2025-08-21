@@ -8,6 +8,7 @@ import { z } from 'zod'
 import { getClientIdFromRequest, rateLimit } from '@/app/lib/rateLimit'
 import { logger, createRequestContext } from '@/lib/logger'
 import { userQueries, withPerformanceMonitoring } from '@/lib/db'
+import { withEnhancedPerformanceMonitoring } from '@/lib/performance'
 
 // 이미지 업로드 경로 설정
 const uploadDir = path.join(process.cwd(), 'public/upload')
@@ -52,8 +53,10 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const userExists = await withPerformanceMonitoring('checkUserExists', () =>
-      userQueries.findByEmailWithPassword(email),
+    const userExists = await withEnhancedPerformanceMonitoring(
+      'checkUserExists',
+      () => userQueries.findByEmailWithPassword(email),
+      { clientId: id },
     )
 
     if (userExists) {
@@ -109,8 +112,10 @@ export async function POST(req: NextRequest) {
       profileImage: imagePath,
     }
 
-    await withPerformanceMonitoring('createUser', () =>
-      userQueries.createUser(newUser),
+    await withEnhancedPerformanceMonitoring(
+      'createUser',
+      () => userQueries.createUser(newUser),
+      { clientId: id, metadata: { hasProfileImage: !!profileImage } },
     )
 
     logger.info('User registered successfully', { ...context, email })
@@ -139,8 +144,10 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const me = await withPerformanceMonitoring('getUserProfile', () =>
-      userQueries.findByEmail(session.user?.email || ''),
+    const me = await withEnhancedPerformanceMonitoring(
+      'getUserProfile',
+      () => userQueries.findByEmail(session.user?.email || ''),
+      { userId: session.user?.id },
     )
 
     if (!me) {
@@ -253,8 +260,14 @@ export async function PUT(req: NextRequest) {
       updateData.profileImage = imagePath
     }
 
-    const user = await withPerformanceMonitoring('updateUserProfile', () =>
-      userQueries.updateUser(email, updateData),
+    const user = await withEnhancedPerformanceMonitoring(
+      'updateUserProfile',
+      () => userQueries.updateUser(email, updateData),
+      {
+        userId: session.user?.id,
+        clientId: id,
+        metadata: { hasProfileImage: !!profileImage },
+      },
     )
 
     if (!user) {

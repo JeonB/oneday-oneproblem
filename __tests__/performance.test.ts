@@ -193,5 +193,23 @@ describe('Performance Monitoring', () => {
       expect(stats[0].p95Duration).toBe(95) // 95th percentile
       expect(stats[0].p99Duration).toBe(99) // 99th percentile
     })
+
+    it('should reset metrics correctly', () => {
+      // Add some metrics
+      recordPerformance('test-op', 100, true)
+      recordPerformance('test-op', 200, true)
+
+      // Verify metrics exist
+      let stats = performanceMonitor.getStats('test-op')
+      expect(stats).toHaveLength(1)
+      expect(stats[0].count).toBe(2)
+
+      // Reset metrics
+      performanceMonitor.reset()
+
+      // Verify metrics are cleared
+      stats = performanceMonitor.getStats('test-op')
+      expect(stats).toHaveLength(0)
+    })
   })
 })

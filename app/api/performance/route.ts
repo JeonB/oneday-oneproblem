@@ -81,8 +81,9 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Reset performance metrics (this would need to be implemented in the monitor)
-    // For now, we'll just log the request
+    // Reset performance metrics
+    performanceMonitor.reset()
+
     logger.info('Performance metrics reset requested', {
       ...context,
       userId: session.user.email,

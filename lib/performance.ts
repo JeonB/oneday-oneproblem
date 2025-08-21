@@ -129,6 +129,12 @@ class PerformanceMonitor {
       clearInterval(this.flushTimer)
     }
   }
+
+  // Reset all metrics
+  reset() {
+    this.metrics = []
+    logger.info('Performance metrics reset successfully')
+  }
 }
 
 // Global performance monitor instance

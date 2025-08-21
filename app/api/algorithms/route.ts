@@ -9,6 +9,7 @@ import {
   withPerformanceMonitoring,
 } from '@/lib/db'
 import { logger, createRequestContext } from '@/lib/logger'
+import { withEnhancedPerformanceMonitoring } from '@/lib/performance'
 
 const AlgorithmSchema = z.object({
   name: z.string().min(1),
@@ -23,8 +24,10 @@ export async function GET(req: NextRequest) {
   logger.info('Algorithms list request received', context)
 
   try {
-    const data = await withPerformanceMonitoring('getAllAlgorithms', () =>
-      algorithmQueries.findAll(),
+    const data = await withEnhancedPerformanceMonitoring(
+      'getAllAlgorithms',
+      () => algorithmQueries.findAll(),
+      { metadata: { endpoint: 'GET' } },
     )
 
     logger.info('Algorithms list retrieved successfully', {
@@ -62,8 +65,16 @@ export async function POST(req: NextRequest) {
   const testalgorithms = parsed.data
 
   try {
-    const result = await withPerformanceMonitoring('bulkInsertAlgorithms', () =>
-      algorithmQueries.bulkInsert(testalgorithms),
+    const result = await withEnhancedPerformanceMonitoring(
+      'bulkInsertAlgorithms',
+      () => algorithmQueries.bulkInsert(testalgorithms),
+      {
+        userId: userSession.user?.id,
+        metadata: {
+          endpoint: 'POST',
+          algorithmsCount: testalgorithms.length,
+        },
+      },
     )
 
     logger.info('Algorithms bulk insert completed', {
@@ -100,14 +111,24 @@ export async function PUT(req: NextRequest) {
   const { name, topic, img } = parsed.data
 
   try {
-    await withPerformanceMonitoring('updateAlgorithm', async () => {
-      const algorithm = await algorithmQueries.findByNames([name])
-      if (!algorithm.length) {
-        throw new Error('해당 알고리즘 없음')
-      }
+    await withEnhancedPerformanceMonitoring(
+      'updateAlgorithm',
+      async () => {
+        const algorithm = await algorithmQueries.findByNames([name])
+        if (!algorithm.length) {
+          throw new Error('해당 알고리즘 없음')
+        }
 
-      return await algorithmQueries.updateAlgorithm(name, { topic, img })
-    })
+        return await algorithmQueries.updateAlgorithm(name, { topic, img })
+      },
+      {
+        userId: session.user?.id,
+        metadata: {
+          endpoint: 'PUT',
+          algorithmName: name,
+        },
+      },
+    )
 
     logger.info('Algorithm updated successfully', {
       ...context,
@@ -153,8 +174,13 @@ export async function DELETE(req: NextRequest) {
   }
 
   try {
-    await withPerformanceMonitoring('deleteAllAlgorithms', () =>
-      algorithmQueries.deleteAll(),
+    await withEnhancedPerformanceMonitoring(
+      'deleteAllAlgorithms',
+      () => algorithmQueries.deleteAll(),
+      {
+        userId: session.user?.id,
+        metadata: { endpoint: 'DELETE' },
+      },
     )
 
     logger.info('All algorithms deleted successfully', context)

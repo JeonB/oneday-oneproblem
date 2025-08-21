@@ -50,3 +50,6 @@ vi.mock('path', () => ({
 beforeEach(() => {
   vi.clearAllMocks()
 })
+
+// Setup testing library
+import '@testing-library/jest-dom'
