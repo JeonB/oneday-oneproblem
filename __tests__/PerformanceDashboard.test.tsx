@@ -6,19 +6,50 @@ import { PerformanceDashboard } from '@/components/PerformanceDashboard'
 // Mock fetch
 global.fetch = vi.fn()
 
+// Mock Response for HEAD requests
+const mockHeadResponse = {
+  ok: true,
+  headers: {
+    get: vi.fn((key: string) => {
+      switch (key) {
+        case 'X-Health-Status':
+          return 'healthy'
+        case 'X-Warnings':
+          return null
+        case 'X-Critical':
+          return null
+        default:
+          return null
+      }
+    }),
+  },
+}
+
 // Mock ErrorBoundary
 vi.mock('@/components/ErrorBoundary', () => ({
-  ErrorBoundary: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  ErrorBoundary: ({ children }: { children: React.ReactNode }) => (
+    <div>{children}</div>
+  ),
 }))
 
 describe('PerformanceDashboard', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // Default mock for HEAD requests
+    ;(fetch as any).mockImplementation((url: string, options?: any) => {
+      if (options?.method === 'HEAD') {
+        return Promise.resolve(mockHeadResponse)
+      }
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({ stats: [], timestamp: Date.now(), total: 0 }),
+      })
+    })
   })
 
   it('should render loading state initially', () => {
     render(<PerformanceDashboard />)
-    
+
     expect(screen.getByText('Loading performance data...')).toBeInTheDocument()
   })
 

@@ -8,6 +8,8 @@ import { DataTable } from '@/components/ui/profile/problems/data-table'
 import { columns } from '@/components/ui/profile/problems/columns'
 import type { Metadata } from 'next'
 import dayjs from 'dayjs'
+import { ProblemProps } from '@/app/lib/models/Problem'
+import mongoose from 'mongoose'
 
 export const metadata: Metadata = {
   title: '프로필 관리',
@@ -48,12 +50,15 @@ export default async function Page() {
     }
     const userId = user?._id
     const problems = await Problem.find({ userId }).lean()
-    const transformedProblems = problems.map(problem => ({
+    const transformedProblems: ProblemProps[] = problems.map(problem => ({
+      _id: problem._id as mongoose.Types.ObjectId,
+      userId: problem.userId as mongoose.Types.ObjectId,
       userSolution: problem.userSolution,
       content: problem.content,
       title: problem.title,
       topic: problem.topic,
       difficulty: problem.difficulty,
+      contentHash: problem.contentHash,
       createdAt: problem.createdAt,
     }))
     const defaultValues = {

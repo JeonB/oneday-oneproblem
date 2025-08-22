@@ -27,6 +27,11 @@ export function PerformanceDashboard() {
   const [error, setError] = useState<string | null>(null)
   const [selectedOperation, setSelectedOperation] = useState<string>('')
   const [refreshInterval, setRefreshInterval] = useState(30000) // 30 seconds
+  const [healthStatus, setHealthStatus] = useState<{
+    healthy: boolean
+    warnings: string[]
+    critical: string[]
+  } | null>(null)
 
   const fetchPerformanceData = useCallback(async () => {
     try {
@@ -54,12 +59,36 @@ export function PerformanceDashboard() {
     }
   }, [selectedOperation])
 
+  const fetchHealthStatus = useCallback(async () => {
+    try {
+      const response = await fetch('/api/performance', { method: 'HEAD' })
+      const healthStatus = {
+        healthy: response.headers.get('X-Health-Status') === 'healthy',
+        warnings: response.headers.get('X-Warnings')?.split(', ') || [],
+        critical: response.headers.get('X-Critical')?.split(', ') || [],
+      }
+      setHealthStatus(healthStatus)
+    } catch (err) {
+      console.error('Failed to fetch health status:', err)
+    }
+  }, [])
+
   useEffect(() => {
     fetchPerformanceData()
+    fetchHealthStatus()
 
     const interval = setInterval(fetchPerformanceData, refreshInterval)
-    return () => clearInterval(interval)
-  }, [selectedOperation, refreshInterval, fetchPerformanceData])
+    const healthInterval = setInterval(fetchHealthStatus, 60000) // Check health every minute
+    return () => {
+      clearInterval(interval)
+      clearInterval(healthInterval)
+    }
+  }, [
+    selectedOperation,
+    refreshInterval,
+    fetchPerformanceData,
+    fetchHealthStatus,
+  ])
 
   const formatDuration = (ms: number) => {
     if (ms < 1) return '<1ms'
@@ -110,6 +139,32 @@ export function PerformanceDashboard() {
             <p className="text-gray-600">
               Real-time performance metrics and system health monitoring
             </p>
+            {healthStatus && (
+              <div className="mt-2 flex items-center space-x-2">
+                <span
+                  className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+                    healthStatus.healthy
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-red-100 text-red-800'
+                  }`}>
+                  {healthStatus.healthy
+                    ? 'System Healthy'
+                    : 'System Issues Detected'}
+                </span>
+                {healthStatus.warnings.length > 0 && (
+                  <span className="inline-flex items-center rounded-full bg-yellow-100 px-2 py-1 text-xs font-medium text-yellow-800">
+                    {healthStatus.warnings.length} Warning
+                    {healthStatus.warnings.length > 1 ? 's' : ''}
+                  </span>
+                )}
+                {healthStatus.critical.length > 0 && (
+                  <span className="inline-flex items-center rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-800">
+                    {healthStatus.critical.length} Critical Issue
+                    {healthStatus.critical.length > 1 ? 's' : ''}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
           <div className="flex items-center space-x-4">
             <select

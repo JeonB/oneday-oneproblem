@@ -1,82 +1,280 @@
-# 1일 1문제 프로젝트
+# OneDay OneProblem - Algorithm Practice Platform
 
-**기간:** 2025.01 - 진행 중
-**목표:**
-매일 하나의 알고리즘 문제를 해결하며, 꾸준한 학습과 문제 해결 능력 향상을 추구하는 프로젝트입니다.
-코드 작성뿐만 아니라 효율성과 가독성을 개선하며, AI 피드백을 통해 코드 품질을 지속적으로 업그레이드합니다.
+A modern web application for practicing algorithms with real-time code execution, performance monitoring, and comprehensive analytics.
+
+## 🚀 Features
+
+### Core Functionality
+
+- **Real-time Code Execution**: Execute algorithms in a secure sandboxed environment
+- **Problem Management**: Create and manage algorithm problems with test cases
+- **User Progress Tracking**: Monitor user progress and solved problems
+- **Performance Analytics**: Comprehensive performance monitoring and analytics
+
+### Performance Monitoring System
+
+- **Real-time Metrics**: Track response times, error rates, and system health
+- **Health Checks**: Automated system health monitoring with alerts
+- **External Integration**: Export metrics to Prometheus, DataDog, and other monitoring systems
+- **Performance Dashboard**: Real-time visualization of system performance
+- **Alerting**: Automatic detection of performance issues and anomalies
+
+## 🛠️ Technology Stack
+
+- **Frontend**: Next.js 15, React 19, TypeScript
+- **Backend**: Next.js API Routes, Node.js
+- **Database**: MongoDB with Mongoose ODM
+- **Authentication**: NextAuth.js
+- **Performance Monitoring**: Custom real-time monitoring system
+- **Testing**: Vitest, React Testing Library
+- **Code Quality**: ESLint, Prettier
+
+## 📊 Performance Monitoring
+
+### Real-time Metrics
+
+The application includes a comprehensive performance monitoring system that tracks:
+
+- **Response Times**: Average, P95, P99 percentiles
+- **Error Rates**: Real-time error tracking and alerting
+- **System Health**: Automated health checks and status monitoring
+- **Operation Analytics**: Per-operation performance metrics
+- **User Analytics**: Performance patterns by user and client
+
+### Health Check Endpoint
+
+```bash
+# Check system health
+curl -I http://localhost:3000/api/performance
+
+# Response headers include:
+# X-Health-Status: healthy/unhealthy
+# X-Error-Rate: 0.0234
+# X-Avg-Response-Time: 150
+# X-Total-Operations: 1234
+```
+
+### Metrics Export
+
+```bash
+# Export metrics in JSON format
+curl -X PATCH http://localhost:3000/api/performance
+
+# Export metrics in Prometheus format
+curl -X PATCH "http://localhost:3000/api/performance?format=prometheus"
+```
+
+### Performance Dashboard
+
+Access the real-time performance dashboard at `/performance` to view:
+
+- System health status
+- Real-time performance metrics
+- Operation-specific analytics
+- Error rate monitoring
+- Response time trends
+
+## 🔧 Installation
+
+1. **Clone the repository**
+
+   ```bash
+   git clone <repository-url>
+   cd oneday-oneproblem
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   pnpm install
+   ```
+
+3. **Environment Setup**
+
+   ```bash
+   cp .env.example .env.local
+   ```
+
+   Configure the following environment variables:
+
+   ```env
+   # Database
+   MONGODB_URI=your_mongodb_connection_string
+
+   # Authentication
+   NEXTAUTH_SECRET=your_nextauth_secret
+   NEXTAUTH_URL=http://localhost:3000
+
+   # Performance Monitoring (Optional)
+   ENABLE_PERFORMANCE_MONITORING=true
+   PERFORMANCE_ALERT_THRESHOLD=1000
+   ```
+
+4. **Database Setup**
+
+   ```bash
+   # The application will automatically create necessary collections
+   # Ensure MongoDB is running and accessible
+   ```
+
+5. **Start Development Server**
+   ```bash
+   pnpm dev
+   ```
+
+## 🧪 Testing
+
+### Run All Tests
+
+```bash
+pnpm test:run
+```
+
+### Run Tests with UI
+
+```bash
+pnpm test:ui
+```
+
+### Test Coverage
+
+The application includes comprehensive tests for:
+
+- API endpoints
+- Performance monitoring system
+- Database operations
+- Rate limiting
+- Error handling
+
+## 📈 Production Deployment
+
+### Performance Monitoring Setup
+
+1. **Enable Performance Monitoring**
+
+   ```env
+   ENABLE_PERFORMANCE_MONITORING=true
+   ```
+
+2. **Configure External Monitoring**
+
+   ```bash
+   # Prometheus configuration example
+   - job_name: 'oneday-oneproblem'
+     static_configs:
+       - targets: ['localhost:3000']
+     metrics_path: '/api/performance'
+     params:
+       format: ['prometheus']
+   ```
+
+3. **Health Check Integration**
+   ```bash
+   # Load balancer health check
+   health_check:
+     path: /api/performance
+     method: HEAD
+     expected_status: 200
+   ```
+
+### Security Considerations
+
+1. **Rate Limiting**: All API endpoints include rate limiting
+2. **Input Validation**: Comprehensive input validation with Zod
+3. **Code Execution**: Sandboxed code execution with security restrictions
+4. **Authentication**: Secure authentication with NextAuth.js
+5. **File Upload**: Secure file upload with validation and sanitization
+
+### Performance Optimization
+
+1. **Database Indexing**: Optimized database queries with proper indexing
+2. **Caching**: Strategic caching for static data
+3. **Connection Pooling**: Efficient database connection management
+4. **Error Boundaries**: Graceful error handling and recovery
+5. **Monitoring**: Real-time performance monitoring and alerting
+
+## 🔍 API Documentation
+
+### Authentication Endpoints
+
+- `POST /api/auth/signin` - User sign in
+- `POST /api/auth/signup` - User registration
+- `GET /api/auth/session` - Get current session
+
+### User Management
+
+- `GET /api/user` - Get user profile
+- `POST /api/user` - Create user
+- `PUT /api/user` - Update user profile
+
+### Problem Management
+
+- `GET /api/algorithms` - Get all algorithms
+- `POST /api/algorithms` - Create algorithms
+- `PUT /api/algorithms` - Update algorithm
+- `DELETE /api/algorithms` - Delete all algorithms
+
+### Code Execution
+
+- `POST /api/executeCode` - Execute user code (fallback)
+- `POST /api/analyzeCode` - Analyze code with AI feedback
+
+### Performance Monitoring
+
+- `GET /api/performance` - Get performance statistics
+- `HEAD /api/performance` - Health check
+- `PATCH /api/performance` - Export metrics
+- `DELETE /api/performance` - Reset metrics
+
+## 🚨 Monitoring and Alerting
+
+### Health Check Alerts
+
+The system automatically detects and alerts on:
+
+- High error rates (>5% critical, >2% warning)
+- Slow response times (>2s critical, >1s warning)
+- High number of slow operations (>10% of total)
+
+### Performance Metrics
+
+Track these key metrics in production:
+
+- **Response Time**: Target <500ms average, <1s P95
+- **Error Rate**: Target <1% error rate
+- **Throughput**: Monitor requests per second
+- **System Health**: Ensure 99.9% uptime
+
+### External Monitoring Integration
+
+The application supports integration with:
+
+- **Prometheus**: Native Prometheus metrics export
+- **DataDog**: JSON metrics format
+- **Grafana**: Compatible metrics format
+- **Custom Monitoring**: Flexible JSON export
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests for new functionality
+5. Ensure all tests pass
+6. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+## 🆘 Support
+
+For support and questions:
+
+- Create an issue in the repository
+- Check the performance dashboard for system status
+- Review the API documentation
 
 ---
 
-## 📝 프로젝트 개요
-
-1일 1문제 프로젝트는 개발자로서의 성장과 학습의 꾸준함을 목표로 설계되었습니다.
-다양한 알고리즘 문제를 해결하면서 자료구조, 시간 복잡도, 효율적인 코딩 방법에 대해 깊이 탐구합니다.
-문제 풀이 과정에서 생성된 코드는 AI 피드백을 통해 분석하고, 개선된 코드를 도출합니다.
-
----
-
-## 💡 주요 기능
-
-### 1. 알고리즘 문제 풀이
-
-- **문제 유형:** 정렬, 탐색, 그래프, 동적 프로그래밍, 트리 등
-- **난이도:** 초급부터 고급까지 다양한 난이도의 문제 해결
-
-### 2. 코드 실행 및 결과 확인
-
-- 입력값과 예상 출력값을 기반으로 코드의 실행 결과를 확인
-- 여러 테스트 케이스에 대해 결과와 에러를 직관적으로 표시
-
-### 3. AI 피드백 기능
-
-- AI를 통해 코드의 효율성 및 가독성을 평가
-- 시간 복잡도 분석 및 개선된 코드 추천
-
-### 4. 결과 시각화
-
-- 테스트 케이스별 성공/실패 여부를 UI로 시각화
-- 피드백 결과를 UI에서 확인 가능
-
----
-
-## 🛠️ 기술 스택
-
-### Frontend
-
-- **프레임워크:** Next.js 14
-- **언어:** TypeScript
-- **스타일링:** Tailwind CSS, clsx
-
-### Backend
-
-- **API:** Node.js 기반 API
-- **AI 피드백:** OpenAI API
-
-### Tools
-
-- **상태 관리:** Context API (useProblemStore)
-- **테스트:** Jest
-
----
-
-## 🖥️ 컴포넌트 구조
-
-### CodeExecution
-
-- 사용자가 작성한 코드를 실행하고, 결과와 AI 피드백을 보여주는 메인 컴포넌트
-
-### ResultDisplay
-
-- 실행 결과와 테스트 케이스의 성공 여부를 시각화
-
-### Feedback
-
-- AI가 제공한 코드 피드백과 개선된 코드를 렌더링
-
----
-
-## 📈 학습 및 성장
-
-- **자료구조와 알고리즘:** 매일 새로운 문제를 해결하며, 다양한 알고리즘과 자료구조에 대한 이해를 강화
-- **코드 품질 개선:** AI 피드백을 활용해 코드의 효율성과 가독성을 지속적으로 개선
-- **시간 관리:** 매일 문제를 해결하며 꾸준히 목표를 달성하는 습관을 형성
+**Built with ❤️ for the developer community**

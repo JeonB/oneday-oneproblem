@@ -48,9 +48,7 @@ export const userQueries = {
 
   // Update user stats efficiently
   async updateStats(email: string, updates: any) {
-    return withDB(() =>
-      User.updateOne({ email }, { $set: updates }, { new: true }),
-    )
+    return withDB(() => User.updateOne({ email }, { $set: updates }))
   },
 
   // Increment user stats

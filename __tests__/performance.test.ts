@@ -75,13 +75,16 @@ describe('Performance Monitoring', () => {
         error: 'Test error',
       })
 
-      expect(logger.error).toHaveBeenCalledWith('Operation failed', {
-        operation: 'failed-operation',
-        duration: 100,
-        error: 'Test error',
-        userId: undefined,
-        clientId: undefined,
-      })
+      expect(logger.error).toHaveBeenCalledWith(
+        'Operation failed',
+        expect.any(Error),
+        {
+          operation: 'failed-operation',
+          duration: 100,
+          userId: undefined,
+          clientId: undefined,
+        },
+      )
     })
   })
 
@@ -210,6 +213,84 @@ describe('Performance Monitoring', () => {
       // Verify metrics are cleared
       stats = performanceMonitor.getStats('test-op')
       expect(stats).toHaveLength(0)
+    })
+
+    it('should export metrics correctly', () => {
+      // Add some metrics
+      recordPerformance('export-test', 100, true)
+      recordPerformance('export-test', 200, false)
+
+      const exportedMetrics = performanceMonitor.exportMetrics()
+      expect(exportedMetrics).toHaveLength(2)
+      expect(exportedMetrics[0].operation).toBe('export-test')
+      expect(exportedMetrics[0].success).toBe(true)
+      expect(exportedMetrics[1].success).toBe(false)
+    })
+
+    it('should provide health status correctly', () => {
+      // Add healthy metrics
+      for (let i = 0; i < 10; i++) {
+        recordPerformance('healthy-test', 50, true)
+      }
+
+      const healthStatus = performanceMonitor.getHealthStatus()
+      expect(healthStatus.healthy).toBe(true)
+      expect(healthStatus.warnings).toHaveLength(0)
+      expect(healthStatus.critical).toHaveLength(0)
+      expect(healthStatus.summary.totalOperations).toBe(10)
+      expect(healthStatus.summary.errorRate).toBe(0)
+    })
+
+    it('should detect high error rate', () => {
+      // Add metrics with high error rate
+      for (let i = 0; i < 10; i++) {
+        recordPerformance('error-test', 100, i < 3) // 70% error rate
+      }
+
+      const healthStatus = performanceMonitor.getHealthStatus()
+      expect(healthStatus.healthy).toBe(false)
+      expect(healthStatus.critical).toHaveLength(1)
+      expect(healthStatus.critical[0]).toContain('High error rate')
+    })
+
+    it('should detect slow operations', () => {
+      // Add slow operations
+      for (let i = 0; i < 10; i++) {
+        recordPerformance('slow-test', 1500, true) // All operations are slow
+      }
+
+      const healthStatus = performanceMonitor.getHealthStatus()
+      expect(healthStatus.healthy).toBe(false)
+      expect(healthStatus.warnings.length).toBeGreaterThan(0)
+      expect(
+        healthStatus.warnings.some(w =>
+          w.includes('High average response time'),
+        ),
+      ).toBe(true)
+    })
+
+    it('should export metrics for monitoring systems', () => {
+      // Add some test metrics
+      recordPerformance('test-op', 100, true)
+      recordPerformance('test-op', 200, false)
+      recordPerformance('another-op', 150, true)
+
+      const monitoringData = performanceMonitor.exportForMonitoring()
+
+      expect(monitoringData.metrics).toBeDefined()
+      expect(monitoringData.summary).toBeDefined()
+      expect(monitoringData.summary.totalOperations).toBe(3)
+      expect(monitoringData.summary.errorRate).toBe(1 / 3)
+
+      // Verify metric structure
+      const firstMetric = monitoringData.metrics[0]
+      expect(firstMetric).toHaveProperty('name')
+      expect(firstMetric).toHaveProperty('value')
+      expect(firstMetric).toHaveProperty('labels')
+      expect(firstMetric).toHaveProperty('timestamp')
+
+      // Check that we have some metrics
+      expect(monitoringData.metrics.length).toBeGreaterThan(0)
     })
   })
 })
