@@ -1,19 +1,19 @@
 import { PerformanceDashboard } from '@/components/PerformanceDashboard'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/app/lib/authoptions'
+import { getCurrentUser, canAccessPerformance } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 
 export default async function PerformancePage() {
-  const session = await getServerSession(authOptions)
+  const user = await getCurrentUser()
 
   // Check if user is authenticated
-  if (!session?.user?.email) {
+  if (!user) {
     redirect('/login')
   }
 
-  // TODO: Add admin role check here
-  // For now, allow any authenticated user to access performance data
-  // In production, you should implement proper role-based access control
+  // Check if user has permission to access performance data
+  if (!canAccessPerformance(user)) {
+    redirect('/unauthorized')
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">

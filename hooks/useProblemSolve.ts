@@ -1,6 +1,7 @@
 import { useProblemStore } from '@/components/context/StoreContext'
 import { TestResult } from '@/components/ui/problem/ResultDisplay'
 import { useCallback, useEffect, useState } from 'react'
+import { useToast } from '@/components/ui/toast/ToastProvider'
 
 export const useProblemSolve = ({
   email,
@@ -15,6 +16,7 @@ export const useProblemSolve = ({
     state => state,
   )
   const [problemSolved, setProblemSolved] = useState(false)
+  const { showToast } = useToast()
   const handleProblemSolve = useCallback(async () => {
     try {
       const response = await fetch('/api/problemSolved', {
@@ -32,14 +34,22 @@ export const useProblemSolve = ({
       })
 
       if (response.ok) {
-        alert('문제를 성공적으로 풀었습니다!')
+        showToast({
+          title: '성공!',
+          message: '문제를 성공적으로 풀었습니다!',
+          type: 'success',
+        })
         setProblemSolved(true)
       } else {
         throw new Error('문제 풀이 업데이트에 실패했습니다.')
       }
     } catch (error) {
       console.error(error)
-      alert('문제를 푸는 데 실패했습니다.')
+      showToast({
+        title: '오류',
+        message: '문제를 푸는 데 실패했습니다.',
+        type: 'error',
+      })
     }
   }, [title, email, userId, topic, difficulty, content, userSolution])
 

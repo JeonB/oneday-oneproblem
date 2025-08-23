@@ -4,6 +4,7 @@ import Problem from '@/app/lib/models/Problem'
 import Algorithms from '@/app/lib/models/Algorithms'
 import { logger } from './logger'
 import { withEnhancedPerformanceMonitoring } from './performance'
+import type { UserData, ProblemData, AlgorithmData } from '@/types'
 
 // Database connection wrapper with error handling
 export async function withDB<T>(operation: () => Promise<T>): Promise<T> {
@@ -35,24 +36,24 @@ export const userQueries = {
   },
 
   // Create new user
-  async createUser(userData: any) {
+  async createUser(userData: Partial<UserData>) {
     return withDB(() => User.create(userData))
   },
 
   // Update user profile
-  async updateUser(email: string, updates: any) {
+  async updateUser(email: string, updates: Partial<UserData>) {
     return withDB(() =>
       User.findOneAndUpdate({ email }, { $set: updates }, { new: true }).lean(),
     )
   },
 
   // Update user stats efficiently
-  async updateStats(email: string, updates: any) {
+  async updateStats(email: string, updates: Partial<UserData>) {
     return withDB(() => User.updateOne({ email }, { $set: updates }))
   },
 
   // Increment user stats
-  async incrementStats(email: string, increments: any) {
+  async incrementStats(email: string, increments: Partial<UserData>) {
     return withDB(() => User.updateOne({ email }, { $inc: increments }))
   },
 }
@@ -90,7 +91,7 @@ export const problemQueries = {
   },
 
   // Create or update problem
-  async upsertProblem(problemData: any) {
+  async upsertProblem(problemData: ProblemData) {
     return withDB(() =>
       Problem.findOneAndUpdate(
         { userId: problemData.userId, contentHash: problemData.contentHash },
@@ -114,7 +115,7 @@ export const algorithmQueries = {
   },
 
   // Update algorithm by name
-  async updateAlgorithm(name: string, updates: any) {
+  async updateAlgorithm(name: string, updates: Partial<AlgorithmData>) {
     return withDB(() => Algorithms.updateOne({ name }, { $set: updates }))
   },
 
@@ -124,13 +125,14 @@ export const algorithmQueries = {
   },
 
   // Bulk insert algorithms with duplicate handling
-  async bulkInsert(algorithms: any[]) {
+  async bulkInsert(algorithms: AlgorithmData[]) {
     return withDB(async () => {
       try {
         return await Algorithms.insertMany(algorithms, { ordered: false })
-      } catch (error: any) {
+      } catch (error: unknown) {
         // Handle duplicate key errors gracefully
-        if (error?.writeErrors?.every((we: any) => we?.code === 11000)) {
+        const mongoError = error as { writeErrors?: Array<{ code: number }> }
+        if (mongoError?.writeErrors?.every(we => we?.code === 11000)) {
           return algorithms
         }
         throw error
