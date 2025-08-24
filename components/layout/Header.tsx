@@ -9,16 +9,23 @@ import Image from 'next/image'
 import logoImg from '@/public/images/logo.png'
 import { useAuthStore } from '@/components/context/StoreContext'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { useToast } from '@/components/ui/toast/ToastProvider'
 
 export default function Header() {
   const router = useRouter()
   const { data: session } = useSession()
   const loginState = useAuthStore(state => state.loginState)
   const setLoginState = useAuthStore(state => state.setLoginState)
+  const { showToast } = useToast()
+
   const onLogout = async () => {
     await signOut({ redirect: false })
     setLoginState(false)
-    alert('로그아웃 되었습니다.')
+    showToast({
+      title: '로그아웃',
+      message: '로그아웃 되었습니다.',
+      type: 'info',
+    })
     router.push('/')
   }
 

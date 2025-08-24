@@ -28,7 +28,7 @@ const toastStyles = {
   info: 'bg-blue-50 border-blue-200 text-blue-800',
 }
 
-export function Toast({
+export const Toast = React.memo(function Toast({
   id,
   title,
   message,
@@ -53,9 +53,10 @@ export function Toast({
       </div>
       <button
         onClick={() => onHide?.(id)}
-        className="flex-shrink-0 rounded p-1 hover:bg-black/10">
+        className="flex-shrink-0 rounded p-1 hover:bg-black/10"
+        aria-label="Close notification">
         <X className="h-4 w-4" />
       </button>
     </motion.div>
   )
-}
+})

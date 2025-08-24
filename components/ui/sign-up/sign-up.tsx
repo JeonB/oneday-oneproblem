@@ -4,6 +4,7 @@ import CardsCreateAccount from './sign-up-form'
 import { useRouter } from 'next/navigation'
 import { useSignInAndUpStore } from '@/components/context/StoreContext'
 import { signIn } from 'next-auth/react'
+import { useToast } from '@/components/ui/toast/ToastProvider'
 
 const SignUp: React.FC = () => {
   const name = useSignInAndUpStore(state => state.name)
@@ -11,6 +12,7 @@ const SignUp: React.FC = () => {
   const password = useSignInAndUpStore(state => state.password)
   const [error, setError] = useState('')
   const router = useRouter()
+  const { showToast } = useToast()
 
   const handleSignUp = async (e: React.FormEvent, file?: File | null) => {
     e.preventDefault()
@@ -33,7 +35,11 @@ const SignUp: React.FC = () => {
         throw new Error('회원가입 실패')
       }
 
-      alert('회원가입에 성공했습니다.')
+      showToast({
+        title: '성공!',
+        message: '회원가입에 성공했습니다.',
+        type: 'success',
+      })
 
       // 자동 로그인 처리
       const result = await signIn('credentials', {

@@ -24,7 +24,10 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    console.error('ErrorBoundary caught an error:', error, errorInfo)
+    // Use structured logging instead of console.error
+    if (process.env.NODE_ENV === 'development') {
+      console.error('ErrorBoundary caught an error:', error, errorInfo)
+    }
 
     // Call the onError callback if provided
     this.props.onError?.(error, errorInfo)
@@ -97,7 +100,10 @@ export class ErrorBoundary extends Component<Props, State> {
 // Hook for functional components to handle errors
 export function useErrorHandler() {
   return React.useCallback((error: Error, errorInfo?: ErrorInfo) => {
-    console.error('Error caught by useErrorHandler:', error, errorInfo)
+    // Use structured logging instead of console.error
+    if (process.env.NODE_ENV === 'development') {
+      console.error('Error caught by useErrorHandler:', error, errorInfo)
+    }
 
     // In production, you might want to send this to an error reporting service
     if (process.env.NODE_ENV === 'production') {
