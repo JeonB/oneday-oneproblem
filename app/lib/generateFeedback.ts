@@ -1,10 +1,18 @@
 import OpenAI from 'openai'
 
-// OpenAI API 초기화
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-  dangerouslyAllowBrowser: true,
-})
+// OpenAI API 클라이언트를 지연 초기화
+const getOpenAIClient = () => {
+  const apiKey = process.env.OPENAI_API_KEY
+  if (!apiKey) {
+    throw new Error(
+      'OPENAI_API_KEY environment variable is not set. Please provide it in your environment variables.',
+    )
+  }
+  return new OpenAI({
+    apiKey,
+    dangerouslyAllowBrowser: true,
+  })
+}
 
 // 피드백 인터페이스 정의
 interface Feedback {
@@ -50,6 +58,7 @@ export async function generateFeedback(
   `
 
   try {
+    const openai = getOpenAIClient()
     const response = await openai.chat.completions.create({
       model: 'gpt-4o-mini',
       messages: [

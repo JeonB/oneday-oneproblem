@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import { useState } from 'react'
 import { Textarea } from './textarea'
 
 const meta = {
@@ -72,28 +73,30 @@ export const Small: Story = {
   },
 }
 
-export const WithCharacterCount: Story = {
-  render: () => {
-    const [value, setValue] = React.useState('')
-    const maxLength = 500
+const WithCharacterCountComponent = () => {
+  const [value, setValue] = useState('')
+  const maxLength = 500
 
-    return (
-      <div className="grid w-full max-w-sm items-center gap-1.5">
-        <label htmlFor="bio" className="text-sm font-medium">
-          Bio
-        </label>
-        <Textarea
-          id="bio"
-          placeholder="Tell us about yourself..."
-          value={value}
-          onChange={e => setValue(e.target.value)}
-          maxLength={maxLength}
-          className="min-h-[100px]"
-        />
-        <div className="text-right text-xs text-gray-500">
-          {value.length}/{maxLength}
-        </div>
+  return (
+    <div className="grid w-full max-w-sm items-center gap-1.5">
+      <label htmlFor="bio" className="text-sm font-medium">
+        Bio
+      </label>
+      <Textarea
+        id="bio"
+        placeholder="Tell us about yourself..."
+        value={value}
+        onChange={e => setValue(e.target.value)}
+        maxLength={maxLength}
+        className="min-h-[100px]"
+      />
+      <div className="text-right text-xs text-gray-500">
+        {value.length}/{maxLength}
       </div>
-    )
-  },
+    </div>
+  )
+}
+
+export const WithCharacterCount: Story = {
+  render: () => <WithCharacterCountComponent />,
 }

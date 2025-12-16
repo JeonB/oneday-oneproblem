@@ -109,7 +109,7 @@ export const WithForm: Story = {
         <AlertDialogHeader>
           <AlertDialogTitle>Edit Profile</AlertDialogTitle>
           <AlertDialogDescription>
-            Make changes to your profile here. Click save when you're done.
+            Make changes to your profile here. Click save when you&apos;re done.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="space-y-4">

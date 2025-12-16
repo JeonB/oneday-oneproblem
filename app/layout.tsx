@@ -20,11 +20,19 @@ const geistMono = localFont({
   weight: '100 900',
 })
 
+const getMetadataBase = (): URL => {
+  if (process.env.NODE_ENV !== 'production') {
+    const devUrl = process.env.DEV_URL
+    return devUrl ? new URL(devUrl) : new URL('http://localhost:3000')
+  } else {
+    const prodUrl = process.env.PRODUCTION_URL
+    // 프로덕션 환경에서는 환경 변수가 필수이지만, 빌드 시점에는 기본값 제공
+    return prodUrl ? new URL(prodUrl) : new URL('https://oneday-oneproblem.com')
+  }
+}
+
 export const metadata: Metadata = {
-  metadataBase:
-    process.env.NODE_ENV !== 'production'
-      ? new URL(process.env.DEV_URL!)
-      : new URL(process.env.PRODUCTION_URL!),
+  metadataBase: getMetadataBase(),
   title: {
     template: '%s | 1일 1문제',
     default: '1일 1문제',

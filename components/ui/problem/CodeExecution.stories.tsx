@@ -23,16 +23,16 @@ type Story = StoryObj<typeof meta>
 
 const mockInputOutput = [
   {
-    input: [1, 2, 3],
-    output: 6,
+    input: ['1', '2', '3'],
+    output: '6',
   },
   {
-    input: [4, 5, 6],
-    output: 15,
+    input: ['4', '5', '6'],
+    output: '15',
   },
   {
-    input: [7, 8, 9],
-    output: 24,
+    input: ['7', '8', '9'],
+    output: '24',
   },
 ]
 
@@ -60,16 +60,16 @@ export const ManyTestCases: Story = {
     inputOutput: [
       ...mockInputOutput,
       {
-        input: [10, 11, 12],
-        output: 33,
+        input: ['10', '11', '12'],
+        output: '33',
       },
       {
-        input: [13, 14, 15],
-        output: 42,
+        input: ['13', '14', '15'],
+        output: '42',
       },
       {
-        input: [16, 17, 18],
-        output: 51,
+        input: ['16', '17', '18'],
+        output: '51',
       },
     ],
   },
@@ -112,19 +112,19 @@ export const ComplexTestCases: Story = {
   args: {
     inputOutput: [
       {
-        input: [
-          [1, 2, 3],
-          [4, 5, 6],
-          [7, 8, 9],
-        ],
-        output: 45,
+        input: JSON.stringify([
+          ['1', '2', '3'],
+          ['4', '5', '6'],
+          ['7', '8', '9'],
+        ]),
+        output: '45',
       },
       {
-        input: [
-          [1, 1],
-          [2, 2],
-        ],
-        output: 6,
+        input: JSON.stringify([
+          ['1', '1'],
+          ['2', '2'],
+        ]),
+        output: '6',
       },
     ],
   },

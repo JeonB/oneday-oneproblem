@@ -3,7 +3,6 @@ import { z } from 'zod'
 import { getClientIdFromRequest, rateLimit } from '@/app/lib/rateLimit'
 import { logger, createRequestContext } from '@/lib/logger'
 
-export const runtime = 'edge'
 export const dynamic = 'force-dynamic'
 
 // Note: This API now serves as a fallback for Web Worker execution

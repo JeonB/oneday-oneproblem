@@ -89,15 +89,15 @@ export const StringTestCases: Story = {
 }`,
     testCases: [
       {
-        input: 'hello',
+        input: ['h', 'e', 'l', 'l', 'o'],
         output: 'olleh',
       },
       {
-        input: 'world',
+        input: ['w', 'o', 'r', 'l', 'd'],
         output: 'dlrow',
       },
       {
-        input: 'algorithm',
+        input: ['a', 'l', 'g', 'o', 'r', 'i', 't', 'h', 'm'],
         output: 'mhtirogla',
       },
     ],

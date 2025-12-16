@@ -18,7 +18,7 @@ describe('POST /api/analyzeCode', () => {
     } as unknown as NextRequest
 
     const response = await POST(mockRequest)
-    const jsonResponse = response.data
+    const jsonResponse = await response.json()
 
     expect(response.status).toBe(200)
     expect(jsonResponse.results).toEqual({
@@ -39,7 +39,7 @@ describe('POST /api/analyzeCode', () => {
     } as unknown as NextRequest
 
     const response = await POST(mockRequest)
-    const jsonResponse = response.data
+    const jsonResponse = await response.json()
 
     expect(response.status).toBe(500)
     expect(jsonResponse.error).toBeDefined()

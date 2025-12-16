@@ -16,6 +16,9 @@ export const metadata: Metadata = {
   description: '프로필 관리 및 문제 상세페이지',
 }
 
+// 동적 렌더링 강제 (빌드 시 prerender 방지)
+export const dynamic = 'force-dynamic'
+
 export default async function Page() {
   await connectDB()
   const session = await getServerSession(authOptions)

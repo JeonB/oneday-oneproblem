@@ -1,4 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import {
+  describe,
+  it,
+  expect,
+  vi,
+  beforeEach,
+  type MockedFunction,
+} from 'vitest'
 import { userQueries, problemQueries, algorithmQueries } from '@/lib/db'
 import { withPerformanceMonitoring } from '@/lib/db'
 
@@ -53,11 +60,11 @@ describe('Database Utilities', () => {
     it('should find user by email with minimal fields', async () => {
       const mockUser = { name: 'Test User', email: 'test@example.com' }
       const User = (await import('@/app/lib/models/User')).default
-      User.findOne.mockReturnValue({
+      ;(User.findOne as MockedFunction<typeof User.findOne>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           lean: vi.fn().mockResolvedValue(mockUser),
         }),
-      })
+      } as any)
 
       const result = await userQueries.findByEmail('test@example.com')
 
@@ -68,7 +75,7 @@ describe('Database Utilities', () => {
     it('should create new user', async () => {
       const mockUserData = { name: 'Test User', email: 'test@example.com' }
       const User = (await import('@/app/lib/models/User')).default
-      User.create.mockResolvedValue(mockUserData)
+      ;(User.create as any).mockResolvedValue(mockUserData)
 
       const result = await userQueries.createUser(mockUserData)
 
@@ -79,9 +86,11 @@ describe('Database Utilities', () => {
     it('should update user profile', async () => {
       const mockUser = { name: 'Updated User', email: 'test@example.com' }
       const User = (await import('@/app/lib/models/User')).default
-      User.findOneAndUpdate.mockReturnValue({
+      ;(
+        User.findOneAndUpdate as MockedFunction<typeof User.findOneAndUpdate>
+      ).mockReturnValue({
         lean: vi.fn().mockResolvedValue(mockUser),
-      })
+      } as any)
 
       const result = await userQueries.updateUser('test@example.com', {
         name: 'Updated User',
@@ -102,7 +111,7 @@ describe('Database Utilities', () => {
       const mockTotal = 2
       const Problem = (await import('@/app/lib/models/Problem')).default
 
-      Problem.find.mockReturnValue({
+      ;(Problem.find as MockedFunction<typeof Problem.find>).mockReturnValue({
         sort: vi.fn().mockReturnValue({
           skip: vi.fn().mockReturnValue({
             limit: vi.fn().mockReturnValue({
@@ -110,8 +119,10 @@ describe('Database Utilities', () => {
             }),
           }),
         }),
-      })
-      Problem.countDocuments.mockResolvedValue(mockTotal)
+      } as any)
+      ;(
+        Problem.countDocuments as MockedFunction<typeof Problem.countDocuments>
+      ).mockResolvedValue(mockTotal)
 
       const result = await problemQueries.findByUserId('user123', {
         page: 1,
@@ -125,9 +136,11 @@ describe('Database Utilities', () => {
     it('should find problem by content hash', async () => {
       const mockProblem = { title: 'Test Problem', contentHash: 'hash123' }
       const Problem = (await import('@/app/lib/models/Problem')).default
-      Problem.findOne.mockReturnValue({
+      ;(
+        Problem.findOne as MockedFunction<typeof Problem.findOne>
+      ).mockReturnValue({
         lean: vi.fn().mockResolvedValue(mockProblem),
-      })
+      } as any)
 
       const result = await problemQueries.findByContentHash(
         'user123',
@@ -146,11 +159,13 @@ describe('Database Utilities', () => {
     it('should find all algorithms', async () => {
       const mockAlgorithms = [{ name: 'Algo 1' }, { name: 'Algo 2' }]
       const Algorithms = (await import('@/app/lib/models/Algorithms')).default
-      Algorithms.find.mockReturnValue({
+      ;(
+        Algorithms.find as MockedFunction<typeof Algorithms.find>
+      ).mockReturnValue({
         select: vi.fn().mockReturnValue({
           lean: vi.fn().mockResolvedValue(mockAlgorithms),
         }),
-      })
+      } as any)
 
       const result = await algorithmQueries.findAll()
 
@@ -159,14 +174,17 @@ describe('Database Utilities', () => {
     })
 
     it('should handle bulk insert with duplicates gracefully', async () => {
-      const mockAlgorithms = [{ name: 'Algo 1' }, { name: 'Algo 2' }]
+      const mockAlgorithms = [
+        { name: 'Algo 1', topic: 'test' },
+        { name: 'Algo 2', topic: 'test' },
+      ]
       const Algorithms = (await import('@/app/lib/models/Algorithms')).default
 
       // Mock duplicate key error
       const duplicateError = {
         writeErrors: [{ code: 11000 }, { code: 11000 }],
       }
-      Algorithms.insertMany.mockRejectedValue(duplicateError)
+      ;(Algorithms.insertMany as any).mockRejectedValue(duplicateError)
 
       const result = await algorithmQueries.bulkInsert(mockAlgorithms)
 

@@ -1,9 +1,17 @@
 import OpenAI from 'openai'
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-  dangerouslyAllowBrowser: true,
-})
+const getOpenAIClient = () => {
+  const apiKey = process.env.OPENAI_API_KEY
+  if (!apiKey) {
+    throw new Error(
+      'OPENAI_API_KEY environment variable is not set. Please provide it in your environment variables.',
+    )
+  }
+  return new OpenAI({
+    apiKey,
+    dangerouslyAllowBrowser: true,
+  })
+}
 
 /**
  * 주어진 주제와 난이도에 따라 알고리즘 문제를 생성하는 함수
@@ -31,6 +39,7 @@ ${topic}이 "random"인 경우, 임의의 주제를 선택해.
 `
 
   try {
+    const openai = getOpenAIClient()
     const response = await openai.chat.completions.create({
       model: 'gpt-4o',
       messages: [

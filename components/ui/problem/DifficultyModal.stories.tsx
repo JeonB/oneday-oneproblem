@@ -27,18 +27,24 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {
   args: {
     isOpen: true,
+    onClose: () => {},
+    onSelectDifficulty: () => {},
   },
 }
 
 export const Closed: Story = {
   args: {
     isOpen: false,
+    onClose: () => {},
+    onSelectDifficulty: () => {},
   },
 }
 
 export const WithCustomStyling: Story = {
   args: {
     isOpen: true,
+    onClose: () => {},
+    onSelectDifficulty: () => {},
   },
   parameters: {
     docs: {

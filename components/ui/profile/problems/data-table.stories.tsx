@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react'
+import type { ColumnDef } from '@tanstack/react-table'
 import { DataTable } from './data-table'
 import { columns } from './columns'
 import { OneDayProvider } from '@/components/context/StoreContext'
+import { ProblemProps } from '@/app/lib/models/Problem'
 
 const meta = {
   title: 'UI/Profile/Problems/DataTable',
@@ -75,7 +77,7 @@ const mockData = [
 
 export const Default: Story = {
   args: {
-    columns,
+    columns: columns as any,
     data: mockData,
     className: 'w-full max-w-4xl',
   },
@@ -83,7 +85,7 @@ export const Default: Story = {
 
 export const Empty: Story = {
   args: {
-    columns,
+    columns: columns as any,
     data: [],
     className: 'w-full max-w-4xl',
   },
@@ -98,7 +100,7 @@ export const Empty: Story = {
 
 export const SingleRecord: Story = {
   args: {
-    columns,
+    columns: columns as any,
     data: [mockData[0]],
     className: 'w-full max-w-4xl',
   },
@@ -113,7 +115,7 @@ export const SingleRecord: Story = {
 
 export const ManyRecords: Story = {
   args: {
-    columns,
+    columns: columns as any,
     data: [
       ...mockData,
       {
